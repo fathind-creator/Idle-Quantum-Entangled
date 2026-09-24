@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Hero - Quantum Idle RPG v6</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 450px;
+            height: 95vh;
+            max-height: 850px;
+            background: #111827;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid #374151;
+            position: relative;
+        }
+        /* Top Header Stats */
+        .header-stats {
+            background: #1f2937;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #374151;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .stat-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        /* Main Content Viewport */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .content-area.active {
+            display: flex;
+        }
+        /* Hero Profile Card */
+        .hero-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid #475569;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+        }
+        .hero-avatar {
+            font-size: 50px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .hero-avatar:active {
+            transform: scale(0.9);
+        }
+        .karma-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 6px;
+            cursor: pointer;
+        }
+        .karma-neutral { background: #64748b; color: #fff; }
+        .karma-light { background: #3b82f6; color: #fff; box-shadow: 0 0 10px #3b82f6; }
+        .karma-shadow { background: #8b5cf6; color: #fff; box-shadow: 0 0 10px #8b5cf6; }
+
+        /* Monster Arena */
+        .arena {
+            background: radial-gradient(circle, #1f2937 0%, #111827 100%);
+            border: 2px dashed #4b5563;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .monster-sprite {
+            font-size: 70px;
+            cursor: pointer;
+            transition: transform 0.05s;
+            margin-bottom: 10px;
+        }
+        .monster-sprite:active {
+            transform: scale(0.85) rotate(-5deg);
+        }
+        .hp-bar-container {
+            width: 100%;
+            background: #374151;
+            height: 14px;
+            border-radius: 7px;
+            overflow: hidden;
+            margin-top: 8px;
+            border: 1px solid #4b5563;
+        }
+        .hp-bar-fill {
+            background: #ef4444;
+            height: 100%;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+        /* Rage / Frenzy & Quantum Bar */
+        .gauge-box {
+            background: #1f2937;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #374151;
+        }
+        .gauge-label {
+            font-size: 11px;
+            color: #9ca3af;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .bar-container {
+            width: 100%;
+            background: #374151;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s;
+        }
+        #frenzyfill { background: #f59e0b; }
+        #quantum-fill { background: #06b6d4; }
+
+        /* Quantum Split-Screen Reality */
+        .quantum-screen {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #06b6d4;
+        }
+        .quantum-panel {
+            background: #1e293b;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        /* Buttons & Cards */
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            width: 100%;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .btn:active { transform: scale(0.97); }
+        .btn-success { background: #16a34a; }
+        .btn-success:hover { background: #15803d; }
+        .btn-purple { background: #7c3aed; }
+        .btn-purple:hover { background: #6d28d9; }
+        .btn-google { background: #db4437; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-google:hover { background: #c53929; }
+
+        .upgrade-card, .guild-card {
+            background: #1f2937;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #374151;
+        }
+
+        /* Navigation Bottom Bar */
+        .nav-bar {
+            background: #1f2937;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 4px;
+            border-top: 2px solid #374151;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .nav-btn.active {
+            color: #3b82f6;
+        }
+        .nav-btn span {
+            font-size: 16px;
+        }
+
+        /* Floating Combat Text */
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.2); opacity: 0; }
+        }
+        .floating-text {
+            position: absolute;
+            font-weight: bold;
+            font-size: 16px;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+        }
+        
+        /* Toast Popup Notification */
+        .toast {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(17, 24, 39, 0.95);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            font-size: 12px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container" id="gameContainer">
+    <!-- TOP STATS BAR -->
+    <div class="header-stats">
+        <div class="stat-badge">💰 <span id="goldDisplay">0</span></div>
+        <div class="stat-badge">💎 <span id="gemsDisplay">0</span></div>
+        <div class="stat-badge">🌌 <span id="soulsDisplay">0</span> Souls <span id="syncIndicator" title="Cloud Sync Status">☁️</span></div>
+    </div>
+
+    <!-- TAB 1: BATTLE & QUANTUM REALITY -->
+    <div id="tab-battle" class="content-area active">
+        <div class="hero-card">
+            <div class="hero-avatar" id="heroAvatar" onclick="handleTap(event)">🧑‍🌾</div>
+            <h3 id="heroClass">Peasant</h3>
+            <p style="font-size: 12px; color: #9ca3af;">Level <span id="heroLevel">1</span> (XP: <span id="heroXp">0</span>/<span id="heroXpMax">50</span>)</p>
+            <div class="karma-badge karma-neutral" id="karmaBtn" onclick="toggleKarma()">Alignment: NEUTRAL</div>
+        </div>
+
+        <!-- Quantum Split Screen -->
+        <div class="quantum-screen">
+            <div class="quantum-panel">
+                <p style="color: #06b6d4; font-weight: bold;">⚡ Present Timeline</p>
+                <p id="presentDps">DPS: 0</p>
+            </div>
+            <div class="quantum-panel">
+                <p style="color: #a855f7; font-weight: bold;">👻 Quantum Ghost Echo</p>
+                <p id="ghostStatus">Syncing Reality...</p>
+            </div>
+        </div>
+
+        <!-- Arena Monster -->
+        <div class="arena" id="arenaBox">
+            <div style="font-size: 12px; color: #f87163; font-weight: bold;" id="mapTitle">Map: Whispering Woods</div>
+            <div class="monster-sprite" id="monsterSprite" onclick="handleTap(event)">🦠</div>
+            <div id="monsterName" style="font-weight: bold; font-size: 14px;">Green Slime</div>
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" id="hpBar"></div>
+            </div>
+            <div style="font-size: 11px; margin-top: 4px; color: #9ca3af;"><span id="monsterHp">50</span> / <span id="monsterHpMax">50</span> HP</div>
+        </div>
+
+        <!-- Gauges -->
+        <div class="gauge-box">
+            <div class="gauge-label"><span>⚡ Hectic Frenzy Rage</span> <span id="frenzyText">0%</span></div>
+            <div class="bar-container"><div class="bar-fill" id="frenzyfill"></div></div>
+        </div>
+        <div class="gauge-box">
+            <div class="gauge-label"><span>⚛️ Quantum Entanglement Sync</span> <span id="quantumText">0%</span></div>
+            <div class="bar-container"><div class="bar-fill" id="quantum-fill"></div></div>
+        </div>
+    </div>
+
+    <!-- TAB 2: MAPS -->
+    <div id="tab-maps" class="content-area">
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🗺️ World Maps</h2>
+        <div class="upgrade-card">
+            <div>
+                <h4>🌲 Whispering Woods</h4>
+                <p style="font-size: 11px; color: #9ca3af;">Multiplier: 1x Gold & XP</p>
+            </div>
+            <button class="btn" onclick="switchMap(0, 'Whispering Woods', 1)">Active</button>
+        </div>
+        <div class="upgrade-card">
+            <div>
+                <h4>🦇 Goblin Caves</h4>
+                <p style="font-size: 11px; color: #9ca3af;">Req: Level 25 | 3x Multiplier</p>
+            </div>
+            <button class="btn" onclick="switchMap(1, 'Goblin Caves', 3)">Travel</button>
+        </div>
+        <div class="upgrade-card">
+            <div>
+                <h4>🌋 Cursed Volcano</h4>
+                <p style="font-size: 11px; color: #9ca3af;">Req: Level 50 | 10x Multiplier</p>
+            </div>
+            <button class="btn" onclick="switchMap(2, 'Cursed Volcano', 10)">Travel</button>
+        </div>
+    </div>
+
+    <!-- TAB 3: TRAIN / UPGRADE & CLOUD SAVE -->
+    <div id="tab-train" class="content-area">
+        <h2 style="font-size: 18px; margin-bottom: 8px;">⚔️ Training Center & Cloud</h2>
+        
+        <!-- Google Cloud Save Box -->
+        <div style="background: #1e293b; padding: 14px; border-radius: 12px; border: 1px solid #3b82f6; text-align: center;">
+            <h3 style="font-size: 15px; color: #60a5fa; margin-bottom: 6px;">☁️ Quantum Cloud Sync</h3>
+            <p id="authStatusText" style="font-size: 11px; color: #9ca3af; margin-bottom: 10px;">Status: Menghubungkan ke Cloud...</p>
+            <button class="btn btn-google" id="googleLoginBtn" onclick="loginWithGoogle()" style="display: none;">
+                <span>🌐</span> Login dengan Google
+            </button>
+            <button class="btn btn-success" onclick="manualSaveProgress()" style="margin-top: 8px;">
+                💾 Simpan Progress Manual
+            </button>
+        </div>
+
+        <div class="upgrade-card">
+            <div>
+                <h4>Sharp Sword (Click Power)</h4>
+                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlClick">1</span> | +<span id="incClick">1</span> Power</p>
+            </div>
+            <button class="btn" onclick="buyUpgrade('click')">Cost: <span id="costClick">20</span> Gold</button>
+        </div>
+        <div class="upgrade-card">
+            <div>
+                <h4>Battle Spirit (Auto DPS)</h4>
+                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlDps">0</span> | +<span id="incDps">1</span> DPS</p>
+            </div>
+            <button class="btn" onclick="buyUpgrade('dps')">Cost: <span id="costDps">50</span> Gold</button>
+        </div>
+        <div style="margin-top: 10px;">
+            <h3 style="font-size: 16px; margin-bottom: 8px;">🌌 Ascension / Rebirth</h3>
+            <p style="font-size: 11px; color: #9ca3af; margin-bottom: 8px;">Butuh Level 50 untuk Reset dan mendapatkan Hero Souls permanen!</p>
+            <button class="btn btn-purple" onclick="doAscension()">Ascension Now</button>
+        </div>
+    </div>
+
+    <!-- TAB 4: GUILD (Mini RTS Dispatch) -->
+    <div id="tab-guild" class="content-area">
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🛡️ Dungeon Guild Dispatch</h2>
+        <p style="font-size: 11px; color: #9ca3af;">Kirim tentara bayaran gacha tavern untuk mencari Gems lintas waktu!</p>
+        <div id="guildList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <p style="font-size: 12px; color: #6b7280; text-align: center;">Belum ada tentara bayaran. Buka peti di Tavern!</p>
+        </div>
+    </div>
+
+    <!-- TAB 5: TAVERN (Gacha) -->
+    <div id="tab-tavern" class="content-area">
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🍻 Mystic Tavern Gacha</h2>
+        <div class="hero-card" style="background: #1f2937;">
+            <h3>Mystic Chest</h3>
+            <p style="font-size: 11px; color: #9ca3af; margin: 6px 0;">Dapatkan Gold masif, Gems, atau Mercenary Guild langka!</p>
+            <button class="btn btn-success" onclick="openChest()">Buka Peti (Cost: <span id="chestCost">500</span> Gold)</button>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="switchTab('battle', this)"><span>⚔️</span>Battle</button>
+        <button class="nav-btn" onclick="switchTab('maps', this)"><span>🗺️</span>Maps</button>
+        <button class="nav-btn" onclick="switchTab('train', this)"><span>🏋️</span>Train</button>
+        <button class="nav-btn" onclick="switchTab('guild', this)"><span>🛡️</span>Guild</button>
+        <button class="nav-btn" onclick="switchTab('tavern', this)"><span>🍻</span>Tavern</button>
+    </div>
+</div>
+
+<div id="toast" class="toast">Notifikasi</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCFrhzwqdlS8BFUUUjrer_Z1IQG90X5xw0",
+        authDomain: "idle-quantum-entangled.firebaseapp.com",
+        projectId: "idle-quantum-entangled",
+        storageBucket: "idle-quantum-entangled.firebasestorage.app",
+        messagingSenderId: "438105447683",
+        appId: "1:438105447683:web:f58a0988e47eef3f5edd36",
+        measurementId: "G-Q89NMT298H"
+    };
+
+    let app, auth, db, userId = null;
+    let isCloudActive = false;
+    let saveTimeout = null;
+
+    // Game State
+    window.game = {
+        gold: 0,
+        gems: 0,
+        souls: 0,
+        level: 1,
+        xp: 0,
+        xpMax: 50,
+        clickPower: 1,
+        dps: 0,
+        clickLvl: 1,
+        dpsLvl: 0,
+        clickCost: 20,
+        dpsCost: 50,
+        chestsBought: 0,
+        chestCost: 500,
+        karma: 'NEUTRAL',
+        mapIndex: 0,
+        mapMultiplier: 1,
+        frenzyRage: 0,
+        frenzyActive: false,
+        quantumSync: 0,
+        mercenaries: [],
+        lastPlayed: Date.now()
+    };
+
+    window.monster = {
+        name: "Green Slime",
+        sprite: "🦠",
+        hp: 50,
+        maxHp: 50,
+        goldReward: 10,
+        xpReward: 15
+    };
+
+    const mapsData = [
+        { name: "Whispering Woods", reqLvl: 1, mult: 1, sprite: "🦠" },
+        { name: "Goblin Caves", reqLvl: 25, mult: 3, sprite: "👺" },
+        { name: "Cursed Volcano", reqLvl: 50, mult: 10, sprite: "🐉" }
+    ];
+
+    // Inisialisasi Firebase & Auth
+    async function initFirebase() {
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isCloudActive = true;
+                    if (user.isAnonymous) {
+                        document.getElementById('authStatusText').innerText = "Status: Mode Tamu (Guest) - Silakan Login Google";
+                        document.getElementById('googleLoginBtn').style.display = 'flex';
+                    } else {
+                        document.getElementById('authStatusText').innerText = `Status: Terhubung (${user.email || user.displayName || 'Google User'})`;
+                        document.getElementById('googleLoginBtn').style.display = 'none';
+                    }
+                    await loadFromCloud();
+                } else {
+                    try {
+                        const cred = await signInAnonymously(auth);
+                        userId = cred.user.uid;
+                    } catch (anonErr) {
+                        console.log("Anonymous auth restricted, using local storage fallback", anonErr);
+                        loadLocal();
+                        document.getElementById('authStatusText').innerText = "Status: Offline Mode (Local Storage)";
+                        document.getElementById('googleLoginBtn').style.display = 'flex';
+                    }
+                }
+            });
+        } catch (e) {
+            console.log("Firebase fallback to localStorage", e);
+            loadLocal();
+            document.getElementById('authStatusText').innerText = "Status: Offline Mode (Local Storage)";
+            document.getElementById('googleLoginBtn').style.display = 'flex';
+        }
+    }
+
+    window.loginWithGoogle = async function() {
+        if (!auth) return;
+        try {
+            const provider = new GoogleAuthProvider();
+            await signInWithPopup(auth, provider);
+            showToast("Berhasil login dengan Google! Progress tersimpan.");
+        } catch (err) {
+            console.error(err);
+            showToast("Gagal Login Google: " + err.message);
+        }
+    };
+
+    async function loadFromCloud() {
+        if (!userId || !db) return;
+        try {
+            const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
+            const snap = await getDoc(docRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.game) {
+                    window.game = { ...window.game, ...data.game };
+                }
+            }
+            calculateOfflineProgress();
+            updateUI();
+        } catch (e) {
+            console.error("Load cloud error", e);
+            loadLocal();
+        }
+    }
+
+    window.manualSaveProgress = async function() {
+        triggerSaveNow();
+        showToast("Progress berhasil disimpan ke Cloud!");
+    }
+
+    function triggerSave() {
+        window.game.lastPlayed = Date.now();
+        localStorage.setItem('quantumSaveV6', JSON.stringify(window.game));
+        if (!isCloudActive || !userId || !db) return;
+
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(async () => {
+            try {
+                const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
+                await setDoc(docRef, { game: window.game, updatedAt: Date.now() });
+                const indicator = document.getElementById('syncIndicator');
+                if (indicator) {
+                    indicator.style.color = '#38bdf8';
+                    setTimeout(() => indicator.style.color = '#fff', 1000);
+                }
+            } catch (e) {
+                console.log("Auto save error", e);
+            }
+        }, 2000);
+    }
+
+    function triggerSaveNow() {
+        window.game.lastPlayed = Date.now();
+        localStorage.setItem('quantumSaveV6', JSON.stringify(window.game));
+        if (isCloudActive && userId && db) {
+            const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
+            setDoc(docRef, { game: window.game, updatedAt: Date.now() }).catch(e => console.log(e));
+        }
+    }
+
+    function loadLocal() {
+        const local = localStorage.getItem('quantumSaveV6');
+        if (local) {
+            window.game = { ...window.game, ...JSON.parse(local) };
+        }
+        calculateOfflineProgress();
+        updateUI();
+    }
+
+    function calculateOfflineProgress() {
+        const diff = Math.floor((Date.now() - window.game.lastPlayed) / 1000);
+        if (diff > 30 && window.game.dps > 0) {
+            const earnedGold = Math.min(diff, 86400) * (window.game.dps * window.game.mapMultiplier * 0.5);
+            window.game.gold += earnedGold;
+            showToast(`Offline Echo: Memperoleh ${Math.round(earnedGold)} Gold!`);
+        }
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    // Navigation Switcher
+    window.switchTab = function(tabId, btnElement) {
+        document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        btnElement.classList.add('active');
+    }
+
+    // Karma Toggle System
+    window.toggleKarma = function() {
+        if(window.game.karma === 'NEUTRAL') {
+            window.game.karma = 'LIGHT';
+            document.getElementById('karmaBtn').className = 'karma-badge karma-light';
+            document.getElementById('karmaBtn').innerText = 'Alignment: LIGHT (Paladin)';
+        } else if(window.game.karma === 'LIGHT') {
+            window.game.karma = 'SHADOW';
+            document.getElementById('karmaBtn').className = 'karma-badge karma-shadow';
+            document.getElementById('karmaBtn').innerText = 'Alignment: SHADOW (Assassin)';
+        } else {
+            window.game.karma = 'NEUTRAL';
+            document.getElementById('karmaBtn').className = 'karma-badge karma-neutral';
+            document.getElementById('karmaBtn').innerText = 'Alignment: NEUTRAL';
+        }
+        triggerSave();
+    }
+
+    // Tap Action & Hectic Frenzy
+    window.handleTap = function(event) {
+        let damage = window.game.clickPower * (window.game.karma === 'SHADOW' ? 2 : 1) * window.game.mapMultiplier * (1 + window.game.souls * 0.5);
+        if(window.game.frenzyActive) damage *= 5;
+
+        window.monster.hp -= damage;
+        showFloatingText(event.clientX, event.clientY, `-${Math.round(damage)}`, '#ef4444');
+
+        window.game.frenzyRage += 4;
+        if(window.game.frenzyRage >= 100 && !window.game.frenzyActive) {
+            triggerFrenzy();
+        }
+
+        window.game.quantumSync += 2;
+        if(window.game.quantumSync >= 100) {
+            triggerQuantumBigBang();
+        }
+
+        if(window.monster.hp <= 0) {
+            defeatMonster();
+        }
+        updateUI();
+        triggerSave();
+    }
+
+    function triggerFrenzy() {
+        window.game.frenzyActive = true;
+        document.getElementById('arenaBox').style.borderColor = '#f59e0b';
+        setTimeout(() => {
+            window.game.frenzyActive = false;
+            window.game.frenzyRage = 0;
+            document.getElementById('arenaBox').style.borderColor = '#4b5563';
+        }, 5000);
+    }
+
+    function triggerQuantumBigBang() {
+        window.game.quantumSync = 0;
+        window.game.gems += 5;
+        showToast('✨ QUANTUM PARADOX: +5 Gems!');
+    }
+
+    function defeatMonster() {
+        let goldGain = window.monster.goldReward * window.game.mapMultiplier * (window.game.karma === 'LIGHT' ? 1.5 : 1);
+        let xpGain = window.monster.xpReward;
+        window.game.gold += goldGain;
+        window.game.xp += xpGain;
+
+        if(window.game.xp >= window.game.xpMax) {
+            window.game.level++;
+            window.game.xp = 0;
+            window.game.xpMax = Math.round(window.game.xpMax * 1.3);
+            checkEvolution();
+            showToast(`LEVEL UP! Selamat, Level ${window.game.level}!`);
+        }
+
+        window.monster.maxHp = Math.round(window.monster.maxHp * 1.15);
+        window.monster.hp = window.monster.maxHp;
+    }
+
+    function checkEvolution() {
+        let avatars = ['🧑‍🌾', '🗡️', '🧙‍♂️', '👼'];
+        let classes = ['Peasant', 'Squire', 'Mage', 'Demigod'];
+        let idx = Math.min(Math.floor(window.game.level / 25), 3);
+        document.getElementById('heroAvatar').innerText = avatars[idx];
+        document.getElementById('heroClass').innerText = classes[idx];
+    }
+
+    function showFloatingText(x, y, text, color) {
+        let el = document.createElement('div');
+        el.className = 'floating-text';
+        el.style.left = (x || 150) + 'px';
+        el.style.top = (y || 300) + 'px';
+        el.style.color = color;
+        el.innerText = text;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 600);
+    }
+
+    // Upgrades
+    window.buyUpgrade = function(type) {
+        if(type === 'click') {
+            if(window.game.gold >= window.game.clickCost) {
+                window.game.gold -= window.game.clickCost;
+                window.game.clickLvl++;
+                window.game.clickPower += 1;
+                window.game.clickCost = Math.round(window.game.clickCost * 1.35);
+            }
+        } else if(type === 'dps') {
+            if(window.game.gold >= window.game.dpsCost) {
+                window.game.gold -= window.game.dpsCost;
+                window.game.dpsLvl++;
+                window.game.dps += 1;
+                window.game.dpsCost = Math.round(window.game.dpsCost * 1.35);
+            }
+        }
+        updateUI();
+        triggerSave();
+    }
+
+    // Maps Switching
+    window.switchMap = function(idx, name, mult) {
+        if(window.game.level < mapsData[idx].reqLvl && idx > 0) {
+            showToast(`Butuh Level ${mapsData[idx].reqLvl} untuk membuka map ini!`);
+            return;
+        }
+        window.game.mapIndex = idx;
+        window.game.mapMultiplier = mult;
+        window.monster.sprite = mapsData[idx].sprite;
+        window.monster.name = name;
+        window.monster.maxHp = 50 * mult * 3;
+        window.monster.hp = window.monster.maxHp;
+        document.getElementById('mapTitle').innerText = `Map: ${name}`;
+        document.getElementById('monsterSprite').innerText = window.monster.sprite;
+        updateUI();
+        triggerSave();
+    }
+
+    // Gacha Tavern Chest
+    window.openChest = function() {
+        if(window.game.gold >= window.game.chestCost) {
+            window.game.gold -= window.game.chestCost;
+            window.game.chestsBought++;
+            window.game.chestCost = Math.round(window.game.chestCost * 1.4);
+
+            let rng = Math.random();
+            if(rng < 0.6) {
+                let rewardGold = 300 * window.game.chestsBought;
+                window.game.gold += rewardGold;
+                showToast(`Mendapat ${rewardGold} Gold dari Mystic Chest!`);
+            } else if(rng < 0.9) {
+                let rewardGems = 10;
+                window.game.gems += rewardGems;
+                showToast(`Langka! Mendapat ${rewardGems} Gems!`);
+            } else {
+                window.game.mercenaries.push({ name: 'Shadow Mercenary #' + (window.game.mercenaries.length + 1), level: 1 });
+                showToast(`EPIC DROP! Merekrut Mercenary Baru untuk Guild!`);
+                renderGuild();
+            }
+        } else {
+            showToast("Gold tidak cukup!");
+        }
+        updateUI();
+        triggerSave();
+    }
+
+    window.renderGuild = function() {
+        let list = document.getElementById('guildList');
+        if(window.game.mercenaries.length === 0) {
+            list.innerHTML = `<p style="font-size: 12px; color: #6b7280; text-align: center;">Belum ada tentara bayaran.</p>`;
+            return;
+        }
+        list.innerHTML = '';
+        window.game.mercenaries.forEach((m, idx) => {
+            list.innerHTML += `
+                <div class="guild-card">
+                    <div>
+                        <h4>${m.name}</h4>
+                        <p style="font-size: 11px; color: #9ca3af;">Status: Ready for Dispatch</p>
+                    </div>
+                    <button class="btn" onclick="dispatchMerc(${idx})">Dispatch</button>
+                </div>
+            `;
+        });
+    }
+
+    window.dispatchMerc = function(idx) {
+        showToast(`${window.game.mercenaries[idx].name} dikirim ke Void Dungeon dan membawa pulang 5 Gems!`);
+        window.game.gems += 5;
+        updateUI();
+        triggerSave();
+    }
+
+    // Ascension / Rebirth
+    window.doAscension = function() {
+        if(window.game.level < 50) {
+            showToast("Level belum mencapai 50 untuk melakukan Ascension!");
+            return;
+        }
+        window.game.souls += Math.floor(window.game.level / 10);
+        window.game.level = 1;
+        window.game.xp = 0;
+        window.game.xpMax = 50;
+        window.game.gold = 0;
+        window.game.clickPower = 1;
+        window.game.dps = 0;
+        window.game.clickLvl = 1;
+        window.game.dpsLvl = 0;
+        window.game.clickCost = 20;
+        window.game.dpsCost = 50;
+        showToast(`Ascension Berhasil! Memperoleh ${window.game.souls} Hero Souls permanen!`);
+        checkEvolution();
+        updateUI();
+        triggerSave();
+    }
+
+    // Idle Loop & DPS Tick
+    setInterval(() => {
+        if(window.game.dps > 0) {
+            let dmg = window.game.dps * window.game.mapMultiplier;
+            window.monster.hp -= dmg;
+            if(window.monster.hp <= 0) {
+                defeatMonster();
+            }
+        }
+        document.getElementById('ghostStatus').innerText = `Echo DPS: +${window.game.dps * 2} (Active)`;
+        document.getElementById('presentDps').innerText = `DPS: ${window.game.dps}`;
+
+        if(!window.game.frenzyActive && window.game.frenzyRage > 0) {
+            window.game.frenzyRage = Math.max(0, window.game.frenzyRage - 1);
+        }
+        updateUI();
+    }, 1000);
+
+    // Auto save trigger every 15s
+    setInterval(() => {
+        triggerSave();
+    }, 15000);
+
+    // UI Updater
+    function updateUI() {
+        document.getElementById('goldDisplay').innerText = Math.round(window.game.gold);
+        document.getElementById('gemsDisplay').innerText = window.game.gems;
+        document.getElementById('soulsDisplay').innerText = window.game.souls;
+        document.getElementById('heroLevel').innerText = window.game.level;
+        document.getElementById('heroXp').innerText = window.game.xp;
+        document.getElementById('heroXpMax').innerText = window.game.xpMax;
+        
+        document.getElementById('monsterHp').innerText = Math.max(0, Math.round(window.monster.hp));
+        document.getElementById('monsterHpMax').innerText = window.monster.maxHp;
+        let hpPercent = Math.max(0, (window.monster.hp / window.monster.maxHp) * 100);
+        document.getElementById('hpBar').style.width = hpPercent + '%';
+
+        document.getElementById('lvlClick').innerText = window.game.clickLvl;
+        document.getElementById('incClick').innerText = window.game.clickPower;
+        document.getElementById('costClick').innerText = window.game.clickCost;
+
+        document.getElementById('lvlDps').innerText = window.game.dpsLvl;
+        document.getElementById('incDps').innerText = window.game.dps;
+        document.getElementById('costDps').innerText = window.game.dpsCost;
+
+        document.getElementById('chestCost').innerText = window.game.chestCost;
+
+        document.getElementById('frenzyfill').style.width = window.game.frenzyRage + '%';
+        document.getElementById('frenzyText').innerText = window.game.frenzyRage + '%';
+        document.getElementById('quantum-fill').style.width = window.game.quantumSync + '%';
+        document.getElementById('quantumText').innerText = window.game.quantumSync + '%';
+    }
+
+    // Run Init
+    initFirebase();
+    renderGuild();
+</script>
+</body>
+</html>
