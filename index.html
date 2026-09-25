@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Hero - Quantum Idle RPG v6</title>
+    <title>My Hero - Quantum Idle RPG Ultimate Edition</title>
     <style>
         * {
             box-sizing: border-box;
@@ -24,14 +24,14 @@
         .game-container {
             width: 100%;
             max-width: 450px;
-            height: 95vh;
-            max-height: 850px;
+            min-height: 95vh;
+            max-height: 900px;
             background: #111827;
             border-radius: 24px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-y: auto;
             border: 2px solid #374151;
             position: relative;
         }
@@ -43,22 +43,25 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #374151;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .stat-badge {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
         /* Main Content Viewport */
         .content-area {
             flex: 1;
-            overflow-y: auto;
             padding: 16px;
             display: none;
             flex-direction: column;
             gap: 16px;
+            padding-bottom: 70px; /* Space for navbar */
         }
         .content-area.active {
             display: flex;
@@ -73,7 +76,7 @@
             position: relative;
         }
         .hero-avatar {
-            font-size: 50px;
+            font-size: 55px;
             margin-bottom: 8px;
             cursor: pointer;
             transition: transform 0.1s;
@@ -101,7 +104,6 @@
             border-radius: 16px;
             padding: 20px;
             text-align: center;
-            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -109,7 +111,7 @@
             position: relative;
         }
         .monster-sprite {
-            font-size: 70px;
+            font-size: 75px;
             cursor: pointer;
             transition: transform 0.05s;
             margin-bottom: 10px;
@@ -132,7 +134,7 @@
             width: 100%;
             transition: width 0.1s linear;
         }
-        /* Rage / Frenzy & Quantum Bar */
+        /* Gauges */
         .gauge-box {
             background: #1f2937;
             padding: 10px;
@@ -199,8 +201,10 @@
         .btn-purple:hover { background: #6d28d9; }
         .btn-google { background: #db4437; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-google:hover { background: #c53929; }
+        .btn-yellow { background: #d97706; }
+        .btn-yellow:hover { background: #b45309; }
 
-        .upgrade-card, .guild-card {
+        .upgrade-card, .guild-card, .collection-card {
             background: #1f2937;
             padding: 12px;
             border-radius: 12px;
@@ -215,18 +219,23 @@
             background: #1f2937;
             display: flex;
             justify-content: space-around;
-            padding: 10px 4px;
+            padding: 10px 2px;
             border-top: 2px solid #374151;
+            position: sticky;
+            bottom: 0;
+            width: 100%;
+            margin-top: auto;
+            z-index: 10;
         }
         .nav-btn {
             background: none;
             border: none;
             color: #9ca3af;
-            font-size: 11px;
+            font-size: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 3px;
+            gap: 2px;
             cursor: pointer;
             flex: 1;
         }
@@ -234,7 +243,7 @@
             color: #3b82f6;
         }
         .nav-btn span {
-            font-size: 16px;
+            font-size: 15px;
         }
 
         /* Floating Combat Text */
@@ -248,9 +257,10 @@
             font-size: 16px;
             pointer-events: none;
             animation: floatUp 0.6s ease-out forwards;
+            z-index: 100;
         }
         
-        /* Toast Popup Notification */
+        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 70px;
@@ -258,13 +268,15 @@
             transform: translateX(-50%);
             background: rgba(17, 24, 39, 0.95);
             color: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid #374151;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid #3b82f6;
             font-size: 12px;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
             display: none;
+            max-width: 90%;
+            text-align: center;
         }
     </style>
 </head>
@@ -274,8 +286,8 @@
     <!-- TOP STATS BAR -->
     <div class="header-stats">
         <div class="stat-badge">💰 <span id="goldDisplay">0</span></div>
-        <div class="stat-badge">💎 <span id="gemsDisplay">0</span></div>
-        <div class="stat-badge">🌌 <span id="soulsDisplay">0</span> Souls <span id="syncIndicator" title="Cloud Sync Status">☁️</span></div>
+        <div class="stat-badge">💎 <span id="gemsDisplay">0</span> <span id="syncIndicator" title="Cloud Sync">☁️</span></div>
+        <div class="stat-badge">🌌 <span id="soulsDisplay">0</span> Souls</div>
     </div>
 
     <!-- TAB 1: BATTLE & QUANTUM REALITY -->
@@ -327,27 +339,27 @@
         <div class="upgrade-card">
             <div>
                 <h4>🌲 Whispering Woods</h4>
-                <p style="font-size: 11px; color: #9ca3af;">Multiplier: 1x Gold & XP</p>
+                <p style="font-size: 11px; color: #9ca3af;">Multiplier: 1x Gold & XP | Diverse Flora & Fauna</p>
             </div>
-            <button class="btn" onclick="switchMap(0, 'Whispering Woods', 1)">Active</button>
+            <button class="btn" onclick="switchMap(0)">Active</button>
         </div>
         <div class="upgrade-card">
             <div>
                 <h4>🦇 Goblin Caves</h4>
-                <p style="font-size: 11px; color: #9ca3af;">Req: Level 25 | 3x Multiplier</p>
+                <p style="font-size: 11px; color: #9ca3af;">Req: Level 25 | 3x Multiplier | Dark Dwellers</p>
             </div>
-            <button class="btn" onclick="switchMap(1, 'Goblin Caves', 3)">Travel</button>
+            <button class="btn" onclick="switchMap(1)">Travel</button>
         </div>
         <div class="upgrade-card">
             <div>
                 <h4>🌋 Cursed Volcano</h4>
-                <p style="font-size: 11px; color: #9ca3af;">Req: Level 50 | 10x Multiplier</p>
+                <p style="font-size: 11px; color: #9ca3af;">Req: Level 50 | 10x Multiplier | Mythical Beast Lair</p>
             </div>
-            <button class="btn" onclick="switchMap(2, 'Cursed Volcano', 10)">Travel</button>
+            <button class="btn" onclick="switchMap(2)">Travel</button>
         </div>
     </div>
 
-    <!-- TAB 3: TRAIN / UPGRADE & CLOUD SAVE -->
+    <!-- TAB 3: TRAIN / UPGRADE & CLOUD -->
     <div id="tab-train" class="content-area">
         <h2 style="font-size: 18px; margin-bottom: 8px;">⚔️ Training Center & Cloud</h2>
         
@@ -355,7 +367,7 @@
         <div style="background: #1e293b; padding: 14px; border-radius: 12px; border: 1px solid #3b82f6; text-align: center;">
             <h3 style="font-size: 15px; color: #60a5fa; margin-bottom: 6px;">☁️ Quantum Cloud Sync</h3>
             <p id="authStatusText" style="font-size: 11px; color: #9ca3af; margin-bottom: 10px;">Status: Menghubungkan ke Cloud...</p>
-            <button class="btn btn-google" id="googleLoginBtn" onclick="loginWithGoogle()" style="display: none;">
+            <button class="btn btn-google" id="googleLoginBtn" onclick="loginWithGoogle()" style="display: none; margin: 0 auto;">
                 <span>🌐</span> Login dengan Google
             </button>
             <button class="btn btn-success" onclick="manualSaveProgress()" style="margin-top: 8px;">
@@ -377,23 +389,55 @@
             </div>
             <button class="btn" onclick="buyUpgrade('dps')">Cost: <span id="costDps">50</span> Gold</button>
         </div>
+        <div class="upgrade-card">
+            <div>
+                <h4>Quantum Bank (Idle Gold/s)</h4>
+                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlBank">0</span> | +<span id="incBank">5</span> Gold/s</p>
+            </div>
+            <button class="btn" onclick="buyUpgrade('bank')">Cost: <span id="costBank">100</span> Gold</button>
+        </div>
         <div style="margin-top: 10px;">
             <h3 style="font-size: 16px; margin-bottom: 8px;">🌌 Ascension / Rebirth</h3>
             <p style="font-size: 11px; color: #9ca3af; margin-bottom: 8px;">Butuh Level 50 untuk Reset dan mendapatkan Hero Souls permanen!</p>
-            <button class="btn btn-purple" onclick="doAscension()">Ascension Now</button>
+            <button class="btn btn-purple" onclick="doAscension()">Ascension Now (Req Lv 50)</button>
         </div>
     </div>
 
-    <!-- TAB 4: GUILD (Mini RTS Dispatch) -->
+    <!-- TAB 4: COLLECTIONS (Relics) -->
+    <div id="tab-collection" class="content-area">
+        <h2 style="font-size: 18px; margin-bottom: 8px;">📦 Relics Collections</h2>
+        <p style="font-size: 11px; color: #9ca3af;">Koleksi Artefak legendaris menggunakan Gems untuk memberikan Bonus Global permanen!</p>
+        <div id="collectionList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <div class="collection-card">
+                <div>
+                    <h4>👑 Crown of Dimensions</h4>
+                    <p style="font-size: 11px; color: #9ca3af;">Bonus: +50% Gold All Sources</p>
+                </div>
+                <button class="btn btn-success" id="btnCrown" onclick="buyRelic('crown', 50)">Buy (50 💎)</button>
+            </div>
+            <div class="collection-card">
+                <div>
+                    <h4>⏳ Chrono Hourglass</h4>
+                    <p style="font-size: 11px; color: #9ca3af;">Bonus: +100% Click Power</p>
+                </div>
+                <button class="btn btn-success" id="btnHourglass" onclick="buyRelic('hourglass', 80)">Buy (80 💎)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 5: GUILD (Enhanced Dispatch) -->
     <div id="tab-guild" class="content-area">
         <h2 style="font-size: 18px; margin-bottom: 8px;">🛡️ Dungeon Guild Dispatch</h2>
-        <p style="font-size: 11px; color: #9ca3af;">Kirim tentara bayaran gacha tavern untuk mencari Gems lintas waktu!</p>
-        <div id="guildList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+        <p style="font-size: 11px; color: #9ca3af;">Kirim Mercenary ke ekspedisi real-time untuk membawa pulang Gems & Material langka!</p>
+        <div style="background: #1e293b; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 11px; color: #38bdf8;">
+            ✨ Pilih Misi Ekspedisi dan tugaskan Mercenary-mu untuk mulai bekerja!
+        </div>
+        <div id="guildList" style="display: flex; flex-direction: column; gap: 10px;">
             <p style="font-size: 12px; color: #6b7280; text-align: center;">Belum ada tentara bayaran. Buka peti di Tavern!</p>
         </div>
     </div>
 
-    <!-- TAB 5: TAVERN (Gacha) -->
+    <!-- TAB 6: TAVERN (Gacha) -->
     <div id="tab-tavern" class="content-area">
         <h2 style="font-size: 18px; margin-bottom: 8px;">🍻 Mystic Tavern Gacha</h2>
         <div class="hero-card" style="background: #1f2937;">
@@ -408,6 +452,7 @@
         <button class="nav-btn active" onclick="switchTab('battle', this)"><span>⚔️</span>Battle</button>
         <button class="nav-btn" onclick="switchTab('maps', this)"><span>🗺️</span>Maps</button>
         <button class="nav-btn" onclick="switchTab('train', this)"><span>🏋️</span>Train</button>
+        <button class="nav-btn" onclick="switchTab('collection', this)"><span>📦</span>Relics</button>
         <button class="nav-btn" onclick="switchTab('guild', this)"><span>🛡️</span>Guild</button>
         <button class="nav-btn" onclick="switchTab('tavern', this)"><span>🍻</span>Tavern</button>
     </div>
@@ -417,7 +462,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -434,7 +479,6 @@
     let isCloudActive = false;
     let saveTimeout = null;
 
-    // Game State
     window.game = {
         gold: 0,
         gems: 0,
@@ -444,10 +488,13 @@
         xpMax: 50,
         clickPower: 1,
         dps: 0,
+        bankGold: 0,
         clickLvl: 1,
         dpsLvl: 0,
+        bankLvl: 0,
         clickCost: 20,
         dpsCost: 50,
+        bankCost: 100,
         chestsBought: 0,
         chestCost: 500,
         karma: 'NEUTRAL',
@@ -457,8 +504,35 @@
         frenzyActive: false,
         quantumSync: 0,
         mercenaries: [],
+        relics: { crown: false, hourglass: false },
         lastPlayed: Date.now()
     };
+
+    // Diverse Monster Pool per Map
+    const mapMonsters = [
+        // Map 0: Whispering Woods
+        [
+            { name: "Green Slime", sprite: "🦠", hpMult: 1, gold: 10, xp: 15 },
+            { name: "Wild Boar", sprite: "🐗", hpMult: 1.3, gold: 14, xp: 20 },
+            { name: "Forest Pixie", sprite: "🧚", hpMult: 0.9, gold: 12, xp: 18 },
+            { name: "Raging Wolf", sprite: "🐺", hpMult: 1.6, gold: 18, xp: 25 },
+            { name: "Treant Sapling", sprite: "🌳", hpMult: 2.2, gold: 25, xp: 35 }
+        ],
+        // Map 1: Goblin Caves
+        [
+            { name: "Cave Goblin", sprite: "👺", hpMult: 3.5, gold: 45, xp: 60 },
+            { name: "Tunnel Bat", sprite: "🦇", hpMult: 3.0, gold: 38, xp: 52 },
+            { name: "Stone Golem", sprite: "🗿", hpMult: 5.0, gold: 70, xp: 90 },
+            { name: "Orc Warrior", sprite: "👹", hpMult: 6.0, gold: 85, xp: 110 }
+        ],
+        // Map 2: Cursed Volcano
+        [
+            { name: "Magma Imp", sprite: "😈", hpMult: 12.0, gold: 180, xp: 220 },
+            { name: "Fire Drake", sprite: "🐉", hpMult: 18.0, gold: 280, xp: 340 },
+            { name: "Phoenix Hatchling", sprite: "🐦‍🔥", hpMult: 15.0, gold: 240, xp: 290 },
+            { name: "Infernal Lord", sprite: "🔥", hpMult: 25.0, gold: 450, xp: 550 }
+        ]
+    ];
 
     window.monster = {
         name: "Green Slime",
@@ -469,28 +543,34 @@
         xpReward: 15
     };
 
-    const mapsData = [
-        { name: "Whispering Woods", reqLvl: 1, mult: 1, sprite: "🦠" },
-        { name: "Goblin Caves", reqLvl: 25, mult: 3, sprite: "👺" },
-        { name: "Cursed Volcano", reqLvl: 50, mult: 10, sprite: "🐉" }
+    const dispatchMissions = [
+        { id: 1, name: "Goblin Outpost", duration: 15, rewardGems: 12, rewardGold: 500 },
+        { id: 2, name: "Dragon Catacombs", duration: 45, rewardGems: 40, rewardGold: 2500 },
+        { id: 3, name: "Quantum Rift Abyss", duration: 120, rewardGems: 120, rewardGold: 10000 }
     ];
 
-    // Inisialisasi Firebase & Auth
     async function initFirebase() {
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
 
+            try {
+                const result = await getRedirectResult(auth);
+                if (result && result.user) {
+                    showToast("Google Login Berhasil! Data tersinkronisasi.");
+                }
+            } catch (e) {}
+
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
                     isCloudActive = true;
                     if (user.isAnonymous) {
-                        document.getElementById('authStatusText').innerText = "Status: Mode Tamu (Guest) - Silakan Login Google";
+                        document.getElementById('authStatusText').innerText = "Status: Mode Tamu (Guest)";
                         document.getElementById('googleLoginBtn').style.display = 'flex';
                     } else {
-                        document.getElementById('authStatusText').innerText = `Status: Terhubung (${user.email || user.displayName || 'Google User'})`;
+                        document.getElementById('authStatusText').innerText = `Status: Terhubung (${user.email || user.displayName})`;
                         document.getElementById('googleLoginBtn').style.display = 'none';
                     }
                     await loadFromCloud();
@@ -498,31 +578,31 @@
                     try {
                         const cred = await signInAnonymously(auth);
                         userId = cred.user.uid;
-                    } catch (anonErr) {
-                        console.log("Anonymous auth restricted, using local storage fallback", anonErr);
+                    } catch (e) {
                         loadLocal();
-                        document.getElementById('authStatusText').innerText = "Status: Offline Mode (Local Storage)";
-                        document.getElementById('googleLoginBtn').style.display = 'flex';
                     }
                 }
             });
         } catch (e) {
-            console.log("Firebase fallback to localStorage", e);
             loadLocal();
-            document.getElementById('authStatusText').innerText = "Status: Offline Mode (Local Storage)";
+            document.getElementById('authStatusText').innerText = "Status: Offline (Local Storage)";
             document.getElementById('googleLoginBtn').style.display = 'flex';
         }
     }
 
     window.loginWithGoogle = async function() {
-        if (!auth) return;
+        if (!auth) return showToast("Auth belum siap!");
         try {
             const provider = new GoogleAuthProvider();
             await signInWithPopup(auth, provider);
-            showToast("Berhasil login dengan Google! Progress tersimpan.");
+            showToast("Berhasil login dengan Google!");
         } catch (err) {
-            console.error(err);
-            showToast("Gagal Login Google: " + err.message);
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithRedirect(auth, provider);
+            } catch (redirErr) {
+                showToast("Gagal Google Login: Pastikan domain ter-whitelist di Firebase.");
+            }
         }
     };
 
@@ -533,26 +613,26 @@
             const snap = await getDoc(docRef);
             if (snap.exists()) {
                 const data = snap.data();
-                if (data.game) {
-                    window.game = { ...window.game, ...data.game };
-                }
+                if (data.game) window.game = { ...window.game, ...data.game };
             }
-            calculateOfflineProgress();
+            checkEvolution();
+            spawnNewMonster();
             updateUI();
+            renderRelicsUI();
+            renderGuild();
         } catch (e) {
-            console.error("Load cloud error", e);
             loadLocal();
         }
     }
 
-    window.manualSaveProgress = async function() {
+    window.manualSaveProgress = function() {
         triggerSaveNow();
         showToast("Progress berhasil disimpan ke Cloud!");
     }
 
     function triggerSave() {
         window.game.lastPlayed = Date.now();
-        localStorage.setItem('quantumSaveV6', JSON.stringify(window.game));
+        localStorage.setItem('quantumSaveUltimate', JSON.stringify(window.game));
         if (!isCloudActive || !userId || !db) return;
 
         clearTimeout(saveTimeout);
@@ -560,60 +640,45 @@
             try {
                 const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
                 await setDoc(docRef, { game: window.game, updatedAt: Date.now() });
-                const indicator = document.getElementById('syncIndicator');
-                if (indicator) {
-                    indicator.style.color = '#38bdf8';
-                    setTimeout(() => indicator.style.color = '#fff', 1000);
-                }
-            } catch (e) {
-                console.log("Auto save error", e);
-            }
+                let ind = document.getElementById('syncIndicator');
+                if(ind) { ind.style.color = '#38bdf8'; setTimeout(()=> ind.style.color='#fff', 1000); }
+            } catch(e){}
         }, 2000);
     }
 
     function triggerSaveNow() {
         window.game.lastPlayed = Date.now();
-        localStorage.setItem('quantumSaveV6', JSON.stringify(window.game));
+        localStorage.setItem('quantumSaveUltimate', JSON.stringify(window.game));
         if (isCloudActive && userId && db) {
             const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
-            setDoc(docRef, { game: window.game, updatedAt: Date.now() }).catch(e => console.log(e));
+            setDoc(docRef, { game: window.game, updatedAt: Date.now() }).catch(e=>{});
         }
     }
 
     function loadLocal() {
-        const local = localStorage.getItem('quantumSaveV6');
-        if (local) {
-            window.game = { ...window.game, ...JSON.parse(local) };
-        }
-        calculateOfflineProgress();
+        const local = localStorage.getItem('quantumSaveUltimate');
+        if (local) window.game = { ...window.game, ...JSON.parse(local) };
+        checkEvolution();
+        spawnNewMonster();
         updateUI();
-    }
-
-    function calculateOfflineProgress() {
-        const diff = Math.floor((Date.now() - window.game.lastPlayed) / 1000);
-        if (diff > 30 && window.game.dps > 0) {
-            const earnedGold = Math.min(diff, 86400) * (window.game.dps * window.game.mapMultiplier * 0.5);
-            window.game.gold += earnedGold;
-            showToast(`Offline Echo: Memperoleh ${Math.round(earnedGold)} Gold!`);
-        }
+        renderRelicsUI();
+        renderGuild();
     }
 
     function showToast(msg) {
-        const t = document.getElementById('toast');
+        let t = document.getElementById('toast');
         t.innerText = msg;
         t.style.display = 'block';
-        setTimeout(() => t.style.display = 'none', 3000);
+        setTimeout(() => t.style.display = 'none', 3500);
     }
 
-    // Navigation Switcher
-    window.switchTab = function(tabId, btnElement) {
+    window.switchTab = function(tabId, btn) {
         document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('tab-' + tabId).classList.add('active');
-        btnElement.classList.add('active');
+        btn.classList.add('active');
     }
 
-    // Karma Toggle System
     window.toggleKarma = function() {
         if(window.game.karma === 'NEUTRAL') {
             window.game.karma = 'LIGHT';
@@ -631,9 +696,26 @@
         triggerSave();
     }
 
-    // Tap Action & Hectic Frenzy
+    function spawnNewMonster() {
+        let list = mapMonsters[window.game.mapIndex] || mapMonsters[0];
+        let randM = list[Math.floor(Math.random() * list.length)];
+        
+        window.monster.name = randM.name;
+        window.monster.sprite = randM.sprite;
+        window.monster.maxHp = Math.round(50 * randM.hpMult * window.game.mapMultiplier);
+        window.monster.hp = window.monster.maxHp;
+        window.monster.goldReward = randM.gold;
+        window.monster.xpReward = randM.xp;
+
+        let nameEl = document.getElementById('monsterName');
+        let spriteEl = document.getElementById('monsterSprite');
+        if(nameEl) nameEl.innerText = window.monster.name;
+        if(spriteEl) spriteEl.innerText = window.monster.sprite;
+    }
+
     window.handleTap = function(event) {
-        let damage = window.game.clickPower * (window.game.karma === 'SHADOW' ? 2 : 1) * window.game.mapMultiplier * (1 + window.game.souls * 0.5);
+        let relicMult = window.game.relics.hourglass ? 2 : 1;
+        let damage = window.game.clickPower * (window.game.karma === 'SHADOW' ? 2 : 1) * window.game.mapMultiplier * (1 + window.game.souls * 0.5) * relicMult;
         if(window.game.frenzyActive) damage *= 5;
 
         window.monster.hp -= damage;
@@ -641,42 +723,32 @@
 
         window.game.frenzyRage += 4;
         if(window.game.frenzyRage >= 100 && !window.game.frenzyActive) {
-            triggerFrenzy();
+            window.game.frenzyActive = true;
+            document.getElementById('arenaBox').style.borderColor = '#f59e0b';
+            setTimeout(() => {
+                window.game.frenzyActive = false;
+                window.game.frenzyRage = 0;
+                document.getElementById('arenaBox').style.borderColor = '#4b5563';
+            }, 5000);
         }
 
         window.game.quantumSync += 2;
         if(window.game.quantumSync >= 100) {
-            triggerQuantumBigBang();
+            window.game.quantumSync = 0;
+            window.game.gems += 5;
+            showToast('✨ QUANTUM PARADOX: +5 Gems!');
         }
 
-        if(window.monster.hp <= 0) {
-            defeatMonster();
-        }
+        if(window.monster.hp <= 0) defeatMonster();
         updateUI();
         triggerSave();
     }
 
-    function triggerFrenzy() {
-        window.game.frenzyActive = true;
-        document.getElementById('arenaBox').style.borderColor = '#f59e0b';
-        setTimeout(() => {
-            window.game.frenzyActive = false;
-            window.game.frenzyRage = 0;
-            document.getElementById('arenaBox').style.borderColor = '#4b5563';
-        }, 5000);
-    }
-
-    function triggerQuantumBigBang() {
-        window.game.quantumSync = 0;
-        window.game.gems += 5;
-        showToast('✨ QUANTUM PARADOX: +5 Gems!');
-    }
-
     function defeatMonster() {
-        let goldGain = window.monster.goldReward * window.game.mapMultiplier * (window.game.karma === 'LIGHT' ? 1.5 : 1);
-        let xpGain = window.monster.xpReward;
+        let relicCrown = window.game.relics.crown ? 1.5 : 1;
+        let goldGain = window.monster.goldReward * window.game.mapMultiplier * (window.game.karma === 'LIGHT' ? 1.5 : 1) * relicCrown;
         window.game.gold += goldGain;
-        window.game.xp += xpGain;
+        window.game.xp += window.monster.xpReward;
 
         if(window.game.xp >= window.game.xpMax) {
             window.game.level++;
@@ -686,8 +758,7 @@
             showToast(`LEVEL UP! Selamat, Level ${window.game.level}!`);
         }
 
-        window.monster.maxHp = Math.round(window.monster.maxHp * 1.15);
-        window.monster.hp = window.monster.maxHp;
+        spawnNewMonster();
     }
 
     function checkEvolution() {
@@ -709,46 +780,68 @@
         setTimeout(() => el.remove(), 600);
     }
 
-    // Upgrades
     window.buyUpgrade = function(type) {
-        if(type === 'click') {
-            if(window.game.gold >= window.game.clickCost) {
-                window.game.gold -= window.game.clickCost;
-                window.game.clickLvl++;
-                window.game.clickPower += 1;
-                window.game.clickCost = Math.round(window.game.clickCost * 1.35);
-            }
-        } else if(type === 'dps') {
-            if(window.game.gold >= window.game.dpsCost) {
-                window.game.gold -= window.game.dpsCost;
-                window.game.dpsLvl++;
-                window.game.dps += 1;
-                window.game.dpsCost = Math.round(window.game.dpsCost * 1.35);
-            }
+        if(type === 'click' && window.game.gold >= window.game.clickCost) {
+            window.game.gold -= window.game.clickCost;
+            window.game.clickLvl++;
+            window.game.clickPower += 1;
+            window.game.clickCost = Math.round(window.game.clickCost * 1.35);
+        } else if(type === 'dps' && window.game.gold >= window.game.dpsCost) {
+            window.game.gold -= window.game.dpsCost;
+            window.game.dpsLvl++;
+            window.game.dps += 1;
+            window.game.dpsCost = Math.round(window.game.dpsCost * 1.35);
+        } else if(type === 'bank' && window.game.gold >= window.game.bankCost) {
+            window.game.gold -= window.game.bankCost;
+            window.game.bankLvl++;
+            window.game.bankGold += 5;
+            window.game.bankCost = Math.round(window.game.bankCost * 1.4);
         }
         updateUI();
         triggerSave();
     }
 
-    // Maps Switching
-    window.switchMap = function(idx, name, mult) {
-        if(window.game.level < mapsData[idx].reqLvl && idx > 0) {
-            showToast(`Butuh Level ${mapsData[idx].reqLvl} untuk membuka map ini!`);
+    window.switchMap = function(idx) {
+        let reqLvl = idx === 1 ? 25 : idx === 2 ? 50 : 1;
+        let names = ['Whispering Woods', 'Goblin Caves', 'Cursed Volcano'];
+        let mults = [1, 3, 10];
+
+        if(window.game.level < reqLvl) {
+            showToast(`Level belum mencukupi! Butuh Level ${reqLvl}`);
             return;
         }
         window.game.mapIndex = idx;
-        window.game.mapMultiplier = mult;
-        window.monster.sprite = mapsData[idx].sprite;
-        window.monster.name = name;
-        window.monster.maxHp = 50 * mult * 3;
-        window.monster.hp = window.monster.maxHp;
-        document.getElementById('mapTitle').innerText = `Map: ${name}`;
-        document.getElementById('monsterSprite').innerText = window.monster.sprite;
+        window.game.mapMultiplier = mults[idx];
+        document.getElementById('mapTitle').innerText = `Map: ${names[idx]}`;
+        spawnNewMonster();
         updateUI();
         triggerSave();
     }
 
-    // Gacha Tavern Chest
+    window.buyRelic = function(relicKey, cost) {
+        if(window.game.gems >= cost && !window.game.relics[relicKey]) {
+            window.game.gems -= cost;
+            window.game.relics[relicKey] = true;
+            showToast("Relic berhasil dibeli! Bonus aktif permanen.");
+            renderRelicsUI();
+            updateUI();
+            triggerSave();
+        } else {
+            showToast("Gems tidak cukup atau sudah dibeli!");
+        }
+    }
+
+    function renderRelicsUI() {
+        if(window.game.relics.crown) {
+            let btn = document.getElementById('btnCrown');
+            if(btn) { btn.innerText = "Owned"; btn.disabled = true; btn.className = "btn"; }
+        }
+        if(window.game.relics.hourglass) {
+            let btn = document.getElementById('btnHourglass');
+            if(btn) { btn.innerText = "Owned"; btn.disabled = true; btn.className = "btn"; }
+        }
+    }
+
     window.openChest = function() {
         if(window.game.gold >= window.game.chestCost) {
             window.game.gold -= window.game.chestCost;
@@ -756,17 +849,25 @@
             window.game.chestCost = Math.round(window.game.chestCost * 1.4);
 
             let rng = Math.random();
-            if(rng < 0.6) {
-                let rewardGold = 300 * window.game.chestsBought;
-                window.game.gold += rewardGold;
-                showToast(`Mendapat ${rewardGold} Gold dari Mystic Chest!`);
-            } else if(rng < 0.9) {
-                let rewardGems = 10;
-                window.game.gems += rewardGems;
-                showToast(`Langka! Mendapat ${rewardGems} Gems!`);
+            if(rng < 0.5) {
+                let reward = 400 * window.game.chestsBought;
+                window.game.gold += reward;
+                showToast(`Mendapat ${reward} Gold dari Mystic Chest!`);
+            } else if(rng < 0.8) {
+                window.game.gems += 15;
+                showToast(`Langka! Mendapat 15 Gems!`);
             } else {
-                window.game.mercenaries.push({ name: 'Shadow Mercenary #' + (window.game.mercenaries.length + 1), level: 1 });
-                showToast(`EPIC DROP! Merekrut Mercenary Baru untuk Guild!`);
+                let ranks = ['Common', 'Rare', 'Epic', 'Legendary'];
+                let rank = ranks[Math.floor(Math.random() * ranks.length)];
+                window.game.mercenaries.push({ 
+                    id: Date.now() + Math.random(),
+                    name: 'Mercenary #' + (window.game.mercenaries.length + 1), 
+                    rank: rank,
+                    status: 'IDLE',
+                    missionId: null,
+                    finishTime: 0
+                });
+                showToast(`EPIC DROP! Merekrut Mercenary Rank [${rank}]!`);
                 renderGuild();
             }
         } else {
@@ -779,34 +880,88 @@
     window.renderGuild = function() {
         let list = document.getElementById('guildList');
         if(window.game.mercenaries.length === 0) {
-            list.innerHTML = `<p style="font-size: 12px; color: #6b7280; text-align: center;">Belum ada tentara bayaran.</p>`;
+            list.innerHTML = `<p style="font-size: 12px; color: #6b7280; text-align: center;">Belum ada tentara bayaran. Buka peti di Tavern!</p>`;
             return;
         }
         list.innerHTML = '';
-        window.game.mercenaries.forEach((m, idx) => {
-            list.innerHTML += `
-                <div class="guild-card">
-                    <div>
-                        <h4>${m.name}</h4>
-                        <p style="font-size: 11px; color: #9ca3af;">Status: Ready for Dispatch</p>
+        window.game.mercenaries.forEach((m) => {
+            let rankColor = m.rank === 'Legendary' ? '#eab308' : m.rank === 'Epic' ? '#a855f7' : m.rank === 'Rare' ? '#3b82f6' : '#9ca3af';
+            let now = Date.now();
+            let actionHtml = '';
+
+            if (m.status === 'IDLE') {
+                actionHtml = `
+                    <div style="display: flex; gap: 4px; margin-top: 6px;">
+                        <select id="mission-select-${m.id}" style="background: #374151; color: #fff; border: none; padding: 4px; border-radius: 6px; font-size: 11px;">
+                            ${dispatchMissions.map(mis => `<option value="${mis.id}">${mis.name} (${mis.duration}s)</option>`).join('')}
+                        </select>
+                        <button class="btn btn-yellow" style="padding: 4px 8px; font-size: 11px;" onclick="startDispatch('${m.id}')">Kirim</button>
                     </div>
-                    <button class="btn" onclick="dispatchMerc(${idx})">Dispatch</button>
+                `;
+            } else if (m.status === 'DISPATCHED') {
+                let timeLeft = Math.max(0, Math.ceil((m.finishTime - now) / 1000));
+                if (timeLeft > 0) {
+                    actionHtml = `<p style="font-size: 11px; color: #f59e0b; margin-top: 4px;">⏳ Ekspedisi... Sisa ${timeLeft}s</p>`;
+                } else {
+                    actionHtml = `<button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-top: 4px;" onclick="claimDispatch('${m.id}')">🎁 Klaim Hadiah</button>`;
+                }
+            }
+
+            list.innerHTML += `
+                <div class="guild-card" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+                    <div style="display: flex; justify-content: space-width; width: 100%; align-items: center;">
+                        <h4 style="font-size: 13px;">${m.name} <span style="font-size: 10px; color: ${rankColor};">[${m.rank}]</span></h4>
+                        <span style="font-size: 10px; color: #9ca3af;">Status: ${m.status}</span>
+                    </div>
+                    ${actionHtml}
                 </div>
             `;
         });
     }
 
-    window.dispatchMerc = function(idx) {
-        showToast(`${window.game.mercenaries[idx].name} dikirim ke Void Dungeon dan membawa pulang 5 Gems!`);
-        window.game.gems += 5;
+    window.startDispatch = function(mercId) {
+        let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
+        if (!m || m.status !== 'IDLE') return;
+
+        let selectEl = document.getElementById(`mission-select-${mercId}`);
+        let missionId = parseInt(selectEl.value);
+        let mission = dispatchMissions.find(mis => mis.id === missionId);
+
+        m.status = 'DISPATCHED';
+        m.missionId = missionId;
+        m.finishTime = Date.now() + (mission.duration * 1000);
+
+        showToast(`${m.name} dikirim ke ${mission.name}!`);
+        renderGuild();
+        triggerSave();
+    }
+
+    window.claimDispatch = function(mercId) {
+        let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
+        if (!m || m.status !== 'DISPATCHED') return;
+
+        let mission = dispatchMissions.find(mis => mis.id === m.missionId);
+        let rankMultiplier = m.rank === 'Legendary' ? 3 : m.rank === 'Epic' ? 2 : m.rank === 'Rare' ? 1.5 : 1;
+        
+        let earnedGems = Math.round(mission.rewardGems * rankMultiplier);
+        let earnedGold = Math.round(mission.rewardGold * rankMultiplier);
+
+        window.game.gems += earnedGems;
+        window.game.gold += earnedGold;
+
+        m.status = 'IDLE';
+        m.missionId = null;
+        m.finishTime = 0;
+
+        showToast(`Misi Selesai! Memperoleh +${earnedGems} 💎 dan +${earnedGold} 💰!`);
+        renderGuild();
         updateUI();
         triggerSave();
     }
 
-    // Ascension / Rebirth
     window.doAscension = function() {
         if(window.game.level < 50) {
-            showToast("Level belum mencapai 50 untuk melakukan Ascension!");
+            showToast("Butuh Level 50 untuk Ascension!");
             return;
         }
         window.game.souls += Math.floor(window.game.level / 10);
@@ -816,27 +971,34 @@
         window.game.gold = 0;
         window.game.clickPower = 1;
         window.game.dps = 0;
-        window.game.clickLvl = 1;
-        window.game.dpsLvl = 0;
-        window.game.clickCost = 20;
-        window.game.dpsCost = 50;
-        showToast(`Ascension Berhasil! Memperoleh ${window.game.souls} Hero Souls permanen!`);
+        window.game.bankGold = 0;
+        showToast(`Ascension Berhasil! +${window.game.souls} Souls permanen!`);
         checkEvolution();
+        spawnNewMonster();
         updateUI();
         triggerSave();
     }
 
-    // Idle Loop & DPS Tick
+    // Tick Loop
     setInterval(() => {
         if(window.game.dps > 0) {
-            let dmg = window.game.dps * window.game.mapMultiplier;
-            window.monster.hp -= dmg;
-            if(window.monster.hp <= 0) {
-                defeatMonster();
-            }
+            window.monster.hp -= (window.game.dps * window.game.mapMultiplier);
+            if(window.monster.hp <= 0) defeatMonster();
         }
+        if(window.game.bankGold > 0) {
+            window.game.gold += window.game.bankGold;
+        }
+
+        let needsRender = false;
+        window.game.mercenaries.forEach(m => {
+            if(m.status === 'DISPATCHED' && Date.now() >= m.finishTime) {
+                needsRender = true;
+            }
+        });
+        if(needsRender) renderGuild();
+
         document.getElementById('ghostStatus').innerText = `Echo DPS: +${window.game.dps * 2} (Active)`;
-        document.getElementById('presentDps').innerText = `DPS: ${window.game.dps}`;
+        document.getElementById('presentDps').innerText = `DPS: ${window.game.dps} | Bank: +${window.game.bankGold}/s`;
 
         if(!window.game.frenzyActive && window.game.frenzyRage > 0) {
             window.game.frenzyRage = Math.max(0, window.game.frenzyRage - 1);
@@ -844,12 +1006,6 @@
         updateUI();
     }, 1000);
 
-    // Auto save trigger every 15s
-    setInterval(() => {
-        triggerSave();
-    }, 15000);
-
-    // UI Updater
     function updateUI() {
         document.getElementById('goldDisplay').innerText = Math.round(window.game.gold);
         document.getElementById('gemsDisplay').innerText = window.game.gems;
@@ -871,6 +1027,10 @@
         document.getElementById('incDps').innerText = window.game.dps;
         document.getElementById('costDps').innerText = window.game.dpsCost;
 
+        document.getElementById('lvlBank').innerText = window.game.bankLvl;
+        document.getElementById('incBank').innerText = window.game.bankGold;
+        document.getElementById('costBank').innerText = window.game.bankCost;
+
         document.getElementById('chestCost').innerText = window.game.chestCost;
 
         document.getElementById('frenzyfill').style.width = window.game.frenzyRage + '%';
@@ -879,8 +1039,8 @@
         document.getElementById('quantumText').innerText = window.game.quantumSync + '%';
     }
 
-    // Run Init
     initFirebase();
+    renderRelicsUI();
     renderGuild();
 </script>
 </body>
