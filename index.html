@@ -349,7 +349,7 @@
                 </div>
                 <button class="btn" id="mapBtn0" onclick="switchMap(0)">Active</button>
             </div>
-            <p style="font-size: 10px; color: #38bdf8;">Drop: +2 🪵 Kayu per 5 monster dikalahkan</p>
+            <p style="font-size: 10px; color: #38bdf8;">Drop: +2 🪵 Kayu per 2 monster dikalahkan</p>
         </div>
 
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 6px;">
@@ -360,7 +360,7 @@
                 </div>
                 <button class="btn" id="mapBtn1" onclick="switchMap(1)">Travel</button>
             </div>
-            <p style="font-size: 10px; color: #38bdf8;">Drop: +1 ⛏️ Batu & +2 💎 Gems bonus</p>
+            <p style="font-size: 10px; color: #38bdf8;">Drop: +1 ⛏️ Batu & +2 💎 Gems setiap 2 monster</p>
         </div>
 
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 6px;">
@@ -371,7 +371,7 @@
                 </div>
                 <button class="btn" id="mapBtn2" onclick="switchMap(2)">Travel</button>
             </div>
-            <p style="font-size: 10px; color: #38bdf8;">Drop: +2 ⛏️ Batu Obsidian</p>
+            <p style="font-size: 10px; color: #38bdf8;">Drop: +2 ⛏️ Batu Obsidian setiap 2 monster</p>
         </div>
     </div>
 
@@ -394,14 +394,14 @@
         <div class="upgrade-card">
             <div>
                 <h4>Sharp Sword (Click Power)</h4>
-                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlClick">1</span> | Power: <span id="currentClickPower">1</span> <span style="color: #38bdf8;">(→ +<span id="incClick">1</span> next)</span></p>
+                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlClick">1</span> | Power: <span id="currentClickPower">1</span> <span style="color: #38bdf8;">(→ +1 next)</span></p>
             </div>
             <button class="btn" onclick="buyUpgrade('click')">Cost: <span id="costClick">20</span> Gold</button>
         </div>
         <div class="upgrade-card">
             <div>
                 <h4>Battle Spirit (Auto DPS)</h4>
-                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlDps">0</span> | DPS: <span id="currentDpsVal">0</span> <span style="color: #38bdf8;">(→ +<span id="incDps">1</span> next)</span></p>
+                <p style="font-size: 11px; color: #9ca3af;">Lvl: <span id="lvlDps">0</span> | DPS: <span id="currentDpsVal">0</span> <span style="color: #38bdf8;">(→ +1 next)</span></p>
             </div>
             <button class="btn" onclick="buyUpgrade('dps')">Cost: <span id="costDps">50</span> Gold</button>
         </div>
@@ -430,9 +430,9 @@
                     <h4>🪵 Rune Ketajaman Kayu</h4>
                     <p style="font-size: 11px; color: #9ca3af;">Level: <span id="wsLvl0">0</span> | Efek: +20% Click Power</p>
                 </div>
-                <button class="btn btn-success" onclick="craftWorkshop(0)">Craft (10 🪵)</button>
+                <button class="btn btn-success" onclick="craftWorkshop(0)">Craft (5 🪵)</button>
             </div>
-            <p style="font-size: 10px; color: #38bdf8;">Biaya berikutnya bertambah 5 Kayu setiap level.</p>
+            <p style="font-size: 10px; color: #38bdf8;">Biaya murah agar mudah dibuat dan memperkuat pukulan.</p>
         </div>
 
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
@@ -441,20 +441,20 @@
                     <h4>⛏️ Batu Asahan Obsidian</h4>
                     <p style="font-size: 11px; color: #9ca3af;">Level: <span id="wsLvl1">0</span> | Efek: +25% DPS Otomatis</p>
                 </div>
-                <button class="btn btn-success" onclick="craftWorkshop(1)">Craft (8 ⛏️)</button>
+                <button class="btn btn-success" onclick="craftWorkshop(1)">Craft (4 ⛏️)</button>
             </div>
-            <p style="font-size: 10px; color: #38bdf8;">Biaya berikutnya bertambah 4 Batu setiap level.</p>
+            <p style="font-size: 10px; color: #38bdf8;">Meningkatkan efisiensi serangan otomatis per detik.</p>
         </div>
 
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                 <div>
                     <h4>🏰 Benteng Quantum Forge</h4>
-                    <p style="font-size: 11px; color: #9ca3af;">Level: <span id="wsLvl2">0</span> | Efek: +1 💎 Gems pasif per 30 detik</p>
+                    <p style="font-size: 11px; color: #9ca3af;">Level: <span id="wsLvl2">0</span> | Efek: +1 💎 Gems pasif per 15 detik</p>
                 </div>
-                <button class="btn btn-success" onclick="craftWorkshop(2)">Craft (5 🪵 & 5 ⛏️)</button>
+                <button class="btn btn-success" onclick="craftWorkshop(2)">Craft (3 🪵 & 3 ⛏️)</button>
             </div>
-            <p style="font-size: 10px; color: #38bdf8;">Menguatkan infrastruktur markas tempur.</p>
+            <p style="font-size: 10px; color: #38bdf8;">Menghasilkan Gems pasif secara berkala.</p>
         </div>
     </div>
 
@@ -766,6 +766,15 @@
         }, 2000);
     }
 
+    function triggerSaveNow() {
+        window.game.lastPlayed = Date.now();
+        localStorage.setItem('quantumSaveUltimate', JSON.stringify(window.game));
+        if (isCloudActive && userId && db) {
+            const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
+            setDoc(docRef, { game: window.game, updatedAt: Date.now() }).catch(e=>{});
+        }
+    }
+
     function loadLocal() {
         const local = localStorage.getItem('quantumSaveUltimate');
         if (local) {
@@ -889,14 +898,15 @@
         window.game.xp = (Number(window.game.xp) || 0) + window.monster.xpReward;
         window.game.monsterDefeatedCount = (Number(window.game.monsterDefeatedCount) || 0) + 1;
 
-        if (window.game.mapIndex === 0 && window.game.monsterDefeatedCount % 5 === 0) {
+        // Drop materials more frequently now (every 2 monsters defeated)
+        if (window.game.mapIndex === 0 && window.game.monsterDefeatedCount % 2 === 0) {
             window.game.wood = (Number(window.game.wood) || 0) + 2;
             showToast("🪵 Memperoleh +2 Kayu Halus dari Whispering Woods!");
-        } else if (window.game.mapIndex === 1 && window.game.monsterDefeatedCount % 4 === 0) {
+        } else if (window.game.mapIndex === 1 && window.game.monsterDefeatedCount % 2 === 0) {
             window.game.stone = (Number(window.game.stone) || 0) + 1;
             window.game.gems = (Number(window.game.gems) || 0) + 2;
             showToast("⛏️ Memperoleh +1 Batu Tambang & +2 Gems!");
-        } else if (window.game.mapIndex === 2 && window.game.monsterDefeatedCount % 3 === 0) {
+        } else if (window.game.mapIndex === 2 && window.game.monsterDefeatedCount % 2 === 0) {
             window.game.stone = (Number(window.game.stone) || 0) + 2;
             showToast("🌋 Memperoleh +2 Batu Obsidian dari Magma!");
         }
@@ -941,16 +951,19 @@
             window.game.clickLvl = (Number(window.game.clickLvl) || 1) + 1;
             window.game.clickPower = (Number(window.game.clickPower) || 1) + 1;
             window.game.clickCost = Math.round((Number(window.game.clickCost) || 20) * 1.35);
+            showToast("⚔️ Sharp Sword ditingkatkan! Click Power bertambah.");
         } else if(type === 'dps' && gold >= window.game.dpsCost) {
             window.game.gold -= window.game.dpsCost;
             window.game.dpsLvl = (Number(window.game.dpsLvl) || 0) + 1;
             window.game.dps = (Number(window.game.dps) || 0) + 1;
             window.game.dpsCost = Math.round((Number(window.game.dpsCost) || 50) * 1.35);
+            showToast("🛡️ Battle Spirit ditingkatkan! DPS Otomatis bertambah.");
         } else if(type === 'bank' && gold >= window.game.bankCost) {
             window.game.gold -= window.game.bankCost;
             window.game.bankLvl = (Number(window.game.bankLvl) || 0) + 1;
             window.game.bankGold = (Number(window.game.bankGold) || 0) + 5;
             window.game.bankCost = Math.round((Number(window.game.bankCost) || 100) * 1.4);
+            showToast("🏦 Quantum Bank ditingkatkan! Gold/s bertambah.");
         }
         updateUI();
         triggerSave();
@@ -959,7 +972,7 @@
     window.craftWorkshop = function(type) {
         if (type === 0) {
             let lvl = Number(window.game.workshop.runeWood.level) || 0;
-            let cost = 10 + (lvl * 5);
+            let cost = 5;
             let currentWood = Number(window.game.wood) || 0;
             if (currentWood >= cost) {
                 window.game.wood -= cost;
@@ -970,7 +983,7 @@
             }
         } else if (type === 1) {
             let lvl = Number(window.game.workshop.runeStone.level) || 0;
-            let cost = 8 + (lvl * 4);
+            let cost = 4;
             let currentStone = Number(window.game.stone) || 0;
             if (currentStone >= cost) {
                 window.game.stone -= cost;
@@ -981,8 +994,8 @@
             }
         } else if (type === 2) {
             let lvl = Number(window.game.workshop.quantumFort.level) || 0;
-            let costWood = 5 + (lvl * 3);
-            let costStone = 5 + (lvl * 3);
+            let costWood = 3;
+            let costStone = 3;
             let currentWood = Number(window.game.wood) || 0;
             let currentStone = Number(window.game.stone) || 0;
             if (currentWood >= costWood && currentStone >= costStone) {
@@ -1385,7 +1398,7 @@
         let fortLvl = Number(window.game.workshop.quantumFort.level) || 0;
         if (fortLvl > 0) {
             fortCounter++;
-            if (fortCounter >= 300) {
+            if (fortCounter >= 150) { // Every 15 seconds
                 fortCounter = 0;
                 window.game.gems = (Number(window.game.gems) || 0) + fortLvl;
             }
