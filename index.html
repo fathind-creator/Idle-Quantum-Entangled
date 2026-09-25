@@ -286,7 +286,7 @@
     <!-- TOP STATS BAR -->
     <div class="header-stats">
         <div class="stat-badge">💰 <span id="goldDisplay">0</span></div>
-        <div class="stat-badge">💎 <span id="gemsDisplay">0</span> <span id="syncIndicator" title="Cloud Sync">☁️</span></div>
+        <div class="stat-badge">💎 <span id="gemsDisplay">0</span> <span id="syncIndicator" title="Cloud Sync Realtime">☁️</span></div>
         <div class="stat-badge">🌌 <span id="soulsDisplay">0</span> Souls</div>
     </div>
 
@@ -463,7 +463,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCFrhzwqdlS8BFUUUjrer_Z1IQG90X5xw0",
@@ -478,6 +478,7 @@
     let app, auth, db, userId = null;
     let isCloudActive = false;
     let saveTimeout = null;
+    let unsubscribeSnapshot = null;
 
     window.game = {
         gold: 0,
@@ -573,7 +574,7 @@
                         document.getElementById('authStatusText').innerText = `Status: Terhubung (${user.email || user.displayName})`;
                         document.getElementById('googleLoginBtn').style.display = 'none';
                     }
-                    await loadFromCloud();
+                    setupRealtimeSync();
                 } else {
                     try {
                         const cred = await signInAnonymously(auth);
@@ -606,28 +607,47 @@
         }
     };
 
-    async function loadFromCloud() {
+    function setupRealtimeSync() {
         if (!userId || !db) return;
-        try {
-            const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
-            const snap = await getDoc(docRef);
+        if (unsubscribeSnapshot) unsubscribeSnapshot();
+
+        const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
+        unsubscribeSnapshot = onSnapshot(docRef, (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
-                if (data.game) window.game = { ...window.game, ...data.game };
+                if (data.game) {
+                    // Hanya sinkronkan jika timestamp server lebih baru atau lokal belum tersinkron
+                    window.game = { ...window.game, ...data.game };
+                    checkEvolution();
+                    updateUI();
+                    renderRelicsUI();
+                    renderGuild();
+                }
             }
-            checkEvolution();
-            spawnNewMonster();
-            updateUI();
-            renderRelicsUI();
-            renderGuild();
-        } catch (e) {
-            loadLocal();
-        }
+        }, (error) => {
+            console.error("Realtime sync error:", error);
+        });
     }
 
-    window.manualSaveProgress = function() {
-        triggerSaveNow();
-        showToast("Progress berhasil disimpan ke Cloud!");
+    window.manualSaveProgress = async function() {
+        if (!isCloudActive || !userId || !db) {
+            triggerSaveNow();
+            showToast("💾 Disimpan secara lokal (Cloud belum terhubung)");
+            return;
+        }
+        
+        try {
+            window.game.lastPlayed = Date.now();
+            localStorage.setItem('quantumSaveUltimate', JSON.stringify(window.game));
+            const docRef = doc(db, 'artifacts', 'idle-quantum', 'users', userId, 'saveData');
+            await setDoc(docRef, { game: window.game, updatedAt: Date.now() });
+            
+            let ind = document.getElementById('syncIndicator');
+            if(ind) { ind.style.color = '#38bdf8'; setTimeout(()=> ind.style.color='#fff', 1500); }
+            showToast("✅ Berhasil menyimpan progress ke Cloud!");
+        } catch(e) {
+            showToast("⚠️ Gagal menyimpan ke Cloud. Periksa koneksi internet.");
+        }
     }
 
     function triggerSave() {
@@ -1040,8 +1060,7 @@
     }
 
     initFirebase();
-    renderRelicsUI();
-    renderGuild();
+    loadLocal();
 </script>
 </body>
 </html>
