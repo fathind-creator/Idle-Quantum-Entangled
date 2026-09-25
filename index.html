@@ -288,6 +288,7 @@
         <div class="stat-badge">💰 <span id="goldDisplay">0</span></div>
         <div class="stat-badge">💎 <span id="gemsDisplay">0</span> <span id="syncIndicator" title="Cloud Sync Realtime">☁️</span></div>
         <div class="stat-badge">🌌 <span id="soulsDisplay">0</span> Souls</div>
+        <div class="stat-badge">🪵 <span id="woodDisplay">0</span> | ⛏️ <span id="stoneDisplay">0</span></div>
     </div>
 
     <!-- TAB 1: BATTLE & QUANTUM REALITY -->
@@ -333,46 +334,42 @@
         </div>
     </div>
 
-    <!-- TAB 2: MAPS & TRAVEL -->
+    <!-- TAB 2: MAPS & EXPANDED TRAVEL REWARDS -->
     <div id="tab-maps" class="content-area">
-        <h2 style="font-size: 18px; margin-bottom: 8px;">🗺️ World Travel & Expedition Drops</h2>
-        <p style="font-size: 11px; color: #9ca3af; margin-bottom: 10px;">Setiap wilayah memiliki keunikan drop material, herba, dan peti jarahan legendaris!</p>
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🗺️ World Maps & Expeditions</h2>
+        <p style="font-size: 11px; color: #9ca3af; margin-bottom: 10px;">Jelajahi peta berbeda untuk memperoleh material unik (Kayu & Batu) serta Gold Multiplier tinggi!</p>
         
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                <h4>🌲 Whispering Woods</h4>
-                <button class="btn" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="switchMap(0)">Active</button>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div>
+                    <h4>🌲 Whispering Woods</h4>
+                    <p style="font-size: 11px; color: #9ca3af;">1x Multiplier | Material: Kayu Halus</p>
+                </div>
+                <button class="btn" id="mapBtn0" onclick="switchMap(0)">Active</button>
             </div>
-            <p style="font-size: 11px; color: #9ca3af;">Multiplier: 1x | Drop Unik: 🌿 Forest Herb, 🍄 Mystic Mushroom</p>
+            <p style="font-size: 10px; color: #38bdf8;">Drop: +2 🪵 Kayu per 5 monster dikalahkan</p>
         </div>
 
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                <h4>🦇 Goblin Caves</h4>
-                <button class="btn btn-yellow" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="switchMap(1)">Travel (Req Lv 25)</button>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div>
+                    <h4>🦇 Goblin Caves</h4>
+                    <p style="font-size: 11px; color: #9ca3af;">Req: Level 25 | 3x Multiplier | Material: Batu Tambang</p>
+                </div>
+                <button class="btn" id="mapBtn1" onclick="switchMap(1)">Travel</button>
             </div>
-            <p style="font-size: 11px; color: #9ca3af;">Multiplier: 3x | Drop Unik: 🪙 Raw Iron Ore, 💎 Cave Crystal</p>
+            <p style="font-size: 10px; color: #38bdf8;">Drop: +1 ⛏️ Batu & +2 💎 Gems bonus setiap clear boss</p>
         </div>
 
         <div class="upgrade-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                <h4>🌋 Cursed Volcano</h4>
-                <button class="btn btn-purple" style="width: auto; padding: 6px 12px; font-size: 11px;" onclick="switchMap(2)">Travel (Req Lv 50)</button>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div>
+                    <h4>🌋 Cursed Volcano</h4>
+                    <p style="font-size: 11px; color: #9ca3af;">Req: Level 50 | 10x Multiplier | Material: Magma Ore</p>
+                </div>
+                <button class="btn" id="mapBtn2" onclick="switchMap(2)">Travel</button>
             </div>
-            <p style="font-size: 11px; color: #9ca3af;">Multiplier: 10x | Drop Unik: 🔥 Magma Core, 👑 Dragon Scale</p>
-        </div>
-
-        <!-- Inventory Material Bag -->
-        <div style="background: #1e293b; padding: 12px; border-radius: 12px; border: 1px solid #3b82f6; margin-top: 10px;">
-            <h3 style="font-size: 14px; color: #60a5fa; margin-bottom: 6px;">🎒 Tas Material Travel</h3>
-            <div id="materialBagDisplay" style="font-size: 11px; color: #d1d5db; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                <span>🌿 Forest Herb: 0</span>
-                <span>🍄 Mystic Mushroom: 0</span>
-                <span>🪙 Iron Ore: 0</span>
-                <span>💎 Cave Crystal: 0</span>
-                <span>🔥 Magma Core: 0</span>
-                <span>👑 Dragon Scale: 0</span>
-            </div>
+            <p style="font-size: 10px; color: #38bdf8;">Drop: +2 ⛏️ Batu Obsidian & Kesempatan Drop Relic Fragment</p>
         </div>
     </div>
 
@@ -422,48 +419,24 @@
 
     <!-- TAB 4: COLLECTIONS (Relics) -->
     <div id="tab-collection" class="content-area">
-        <h2 style="font-size: 18px; margin-bottom: 8px;">📦 Relics Collections & Upgrades</h2>
-        <p style="font-size: 11px; color: #9ca3af;">Koleksi Artefak legendaris menggunakan Gems dan tingkatkan levelnya untuk efek yang semakin menggila!</p>
+        <h2 style="font-size: 18px; margin-bottom: 8px;">📦 Relics Collections</h2>
+        <p style="font-size: 11px; color: #9ca3af;">Koleksi Artefak legendaris menggunakan Gems & Material untuk memberikan Bonus Global permanen serta dapat di-upgrade!</p>
         <div id="collectionList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-            <div class="collection-card" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <h4>👑 Crown of Dimensions <span id="relicLvl-crown" style="font-size:11px; color:#38bdf8;">(Lv. 0)</span></h4>
-                    <button class="btn btn-success" id="btnCrown" style="width:auto; padding:6px 12px; font-size:11px;" onclick="buyOrUpgradeRelic('crown', 50)">Unlock (50 💎)</button>
-                </div>
-                <p style="font-size: 11px; color: #9ca3af;" id="relicDesc-crown">Bonus: +50% Gold All Sources per Level</p>
-            </div>
-            <div class="collection-card" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <h4>⏳ Chrono Hourglass <span id="relicLvl-hourglass" style="font-size:11px; color:#38bdf8;">(Lv. 0)</span></h4>
-                    <button class="btn btn-success" id="btnHourglass" style="width:auto; padding:6px 12px; font-size:11px;" onclick="buyOrUpgradeRelic('hourglass', 80)">Unlock (80 💎)</button>
-                </div>
-                <p style="font-size: 11px; color: #9ca3af;" id="relicDesc-hourglass">Bonus: +100% Click Power per Level</p>
-            </div>
-            <div class="collection-card" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <h4>🔮 Orb of Quantum Chaos <span id="relicLvl-orb" style="font-size:11px; color:#38bdf8;">(Lv. 0)</span></h4>
-                    <button class="btn btn-success" id="btnOrb" style="width:auto; padding:6px 12px; font-size:11px;" onclick="buyOrUpgradeRelic('orb', 120)">Unlock (120 💎)</button>
-                </div>
-                <p style="font-size: 11px; color: #9ca3af;" id="relicDesc-orb">Bonus: +20% Frenzy & Quantum Gauge Speed per Level</p>
-            </div>
+            <!-- Rendered dynamically -->
         </div>
     </div>
 
-    <!-- TAB 5: GUILD (Enhanced RTS & Stamina System) -->
+    <!-- TAB 5: GUILD (Enriched Advanced Dispatch & Mercenary Management) -->
     <div id="tab-guild" class="content-area">
-        <h2 style="font-size: 18px; margin-bottom: 8px;">🛡️ Dungeon Guild & Mercenary Command</h2>
-        <p style="font-size: 11px; color: #9ca3af;">Kelola Stamina tentara bayaranmu, tentukan Spesialisasi Kelas, dan ambil Misi Papan Bounties real-time!</p>
+        <h2 style="font-size: 18px; margin-bottom: 8px;">🛡️ Advanced Dungeon Guild</h2>
+        <p style="font-size: 11px; color: #9ca3af;">Kelola Stamina Mercenary, tugaskan ke Misi Spesialisasi, dan manfaatkan Skill Pasif mereka!</p>
         
-        <!-- Papan Misi (Bounty Board) -->
-        <div style="background: #1e293b; padding: 12px; border-radius: 12px; border: 1px solid #3b82f6;">
-            <h3 style="font-size: 14px; color: #60a5fa; margin-bottom: 6px;">📜 Papan Bounties Guild</h3>
-            <div id="bountyBoardList" style="display:flex; flex-direction:column; gap:6px;">
-                <!-- Dinamis diisi JS -->
-            </div>
+        <div style="background: #1e293b; padding: 12px; border-radius: 12px; border: 1px solid #38bdf8;">
+            <h4 style="font-size: 13px; color: #38bdf8; margin-bottom: 4px;">🏰 Markas Guild Mark</h4>
+            <p style="font-size: 11px; color: #9ca3af;">Mercenary yang kehabisan Stamina (0%) harus beristirahat di Markas agar pulih kembali.</p>
         </div>
 
-        <h3 style="font-size: 15px; margin-top: 10px;">👥 Pasukan Mercenary Aktif</h3>
-        <div id="guildList" style="display: flex; flex-direction: column; gap: 10px;">
+        <div id="guildList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
             <p style="font-size: 12px; color: #6b7280; text-align: center;">Belum ada tentara bayaran. Buka peti di Tavern!</p>
         </div>
     </div>
@@ -473,7 +446,7 @@
         <h2 style="font-size: 18px; margin-bottom: 8px;">🍻 Mystic Tavern Gacha</h2>
         <div class="hero-card" style="background: #1f2937;">
             <h3>Mystic Chest</h3>
-            <p style="font-size: 11px; color: #9ca3af; margin: 6px 0;">Dapatkan Gold masif, Gems, atau Mercenary Guild langka!</p>
+            <p style="font-size: 11px; color: #9ca3af; margin: 6px 0;">Dapatkan Gold masif, Gems, atau Mercenary Guild dengan Spesialisasi unik!</p>
             <button class="btn btn-success" onclick="openChest()">Buka Peti (Cost: <span id="chestCost">500</span> Gold)</button>
         </div>
     </div>
@@ -481,7 +454,7 @@
     <!-- BOTTOM NAVIGATION -->
     <div class="nav-bar">
         <button class="nav-btn active" onclick="switchTab('battle', this)"><span>⚔️</span>Battle</button>
-        <button class="nav-btn" onclick="switchTab('maps', this)"><span>🗺️</span>Travel</button>
+        <button class="nav-btn" onclick="switchTab('maps', this)"><span>🗺️</span>Maps</button>
         <button class="nav-btn" onclick="switchTab('train', this)"><span>🏋️</span>Train</button>
         <button class="nav-btn" onclick="switchTab('collection', this)"><span>📦</span>Relics</button>
         <button class="nav-btn" onclick="switchTab('guild', this)"><span>🛡️</span>Guild</button>
@@ -515,6 +488,8 @@
         gold: 0,
         gems: 0,
         souls: 0,
+        wood: 0,
+        stone: 0,
         level: 1,
         xp: 0,
         xpMax: 50,
@@ -532,41 +507,40 @@
         karma: 'NEUTRAL',
         mapIndex: 0,
         mapMultiplier: 1,
+        monsterDefeatedCount: 0,
         frenzyRage: 0,
         frenzyActive: false,
         quantumSync: 0,
         mercenaries: [],
-        materials: { herb: 0, mushroom: 0, iron: 0, crystal: 0, magma: 0, scale: 0 },
-        relics: { 
-            crown: { level: 0, baseCost: 50 }, 
-            hourglass: { level: 0, baseCost: 80 },
-            orb: { level: 0, baseCost: 120 }
+        relics: {
+            crown: { level: 0, unlocked: false, cost: 50, name: "👑 Crown of Dimensions", desc: "+50% Gold Multiplier per level" },
+            hourglass: { level: 0, unlocked: false, cost: 80, name: "⏳ Chrono Hourglass", desc: "+100% Click Power per level" },
+            berserkAmulet: { level: 0, unlocked: false, cost: 120, name: "🔥 Berserk Amulet", desc: "+10% Crit / Frenzy rate per level" },
+            quantumCore: { level: 0, unlocked: false, cost: 200, name: "⚛️ Quantum Core", desc: "+2 Gems bonus on Paradox per level" }
         },
         lastPlayed: Date.now()
     };
 
-    // Rich Monster Pool per Map dengan Drop Material Unik
+    // Diverse Monster Pool per Map
     const mapMonsters = [
-        // Map 0: Whispering Woods
         [
-            { name: "Green Slime", sprite: "🦠", hpMult: 1, gold: 10, xp: 15, mat: 'herb', matChance: 0.6 },
-            { name: "Wild Boar", sprite: "🐗", hpMult: 1.3, gold: 14, xp: 20, mat: 'herb', matChance: 0.4 },
-            { name: "Forest Pixie", sprite: "🧚", hpMult: 0.9, gold: 12, xp: 18, mat: 'mushroom', matChance: 0.5 },
-            { name: "Raging Wolf", sprite: "🐺", hpMult: 1.6, gold: 18, xp: 25, mat: 'mushroom', matChance: 0.3 }
+            { name: "Green Slime", sprite: "🦠", hpMult: 1, gold: 10, xp: 15 },
+            { name: "Wild Boar", sprite: "🐗", hpMult: 1.3, gold: 14, xp: 20 },
+            { name: "Forest Pixie", sprite: "🧚", hpMult: 0.9, gold: 12, xp: 18 },
+            { name: "Raging Wolf", sprite: "🐺", hpMult: 1.6, gold: 18, xp: 25 },
+            { name: "Treant Sapling", sprite: "🌳", hpMult: 2.2, gold: 25, xp: 35 }
         ],
-        // Map 1: Goblin Caves
         [
-            { name: "Cave Goblin", sprite: "👺", hpMult: 3.5, gold: 45, xp: 60, mat: 'iron', matChance: 0.5 },
-            { name: "Tunnel Bat", sprite: "🦇", hpMult: 3.0, gold: 38, xp: 52, mat: 'iron', matChance: 0.3 },
-            { name: "Stone Golem", sprite: "🗿", hpMult: 5.0, gold: 70, xp: 90, mat: 'crystal', matChance: 0.4 },
-            { name: "Orc Warrior", sprite: "👹", hpMult: 6.0, gold: 85, xp: 110, mat: 'crystal', matChance: 0.2 }
+            { name: "Cave Goblin", sprite: "👺", hpMult: 3.5, gold: 45, xp: 60 },
+            { name: "Tunnel Bat", sprite: "🦇", hpMult: 3.0, gold: 38, xp: 52 },
+            { name: "Stone Golem", sprite: "🗿", hpMult: 5.0, gold: 70, xp: 90 },
+            { name: "Orc Warrior", sprite: "👹", hpMult: 6.0, gold: 85, xp: 110 }
         ],
-        // Map 2: Cursed Volcano
         [
-            { name: "Magma Imp", sprite: "😈", hpMult: 12.0, gold: 180, xp: 220, mat: 'magma', matChance: 0.5 },
-            { name: "Fire Drake", sprite: "🐉", hpMult: 18.0, gold: 280, xp: 340, mat: 'scale', matChance: 0.3 },
-            { name: "Phoenix Hatchling", sprite: "🐦‍🔥", hpMult: 15.0, gold: 240, xp: 290, mat: 'magma', matChance: 0.4 },
-            { name: "Infernal Lord", sprite: "🔥", hpMult: 25.0, gold: 450, xp: 550, mat: 'scale', matChance: 0.2 }
+            { name: "Magma Imp", sprite: "😈", hpMult: 12.0, gold: 180, xp: 220 },
+            { name: "Fire Drake", sprite: "🐉", hpMult: 18.0, gold: 280, xp: 340 },
+            { name: "Phoenix Hatchling", sprite: "🐦‍🔥", hpMult: 15.0, gold: 240, xp: 290 },
+            { name: "Infernal Lord", sprite: "🔥", hpMult: 25.0, gold: 450, xp: 550 }
         ]
     ];
 
@@ -576,16 +550,17 @@
         hp: 50,
         maxHp: 50,
         goldReward: 10,
-        xpReward: 15,
-        mat: 'herb'
+        xpReward: 15
     };
 
-    // Guild Bounty Quests Board
-    const guildBounties = [
-        { id: 1, name: "Patroli Hutan", duration: 15, reqRank: 'Common', rewardGems: 10, rewardGold: 300, matType: 'herb', matQty: 3 },
-        { id: 2, name: "Eksplorasi Goa Tambang", duration: 45, reqRank: 'Rare', rewardGems: 35, rewardGold: 1500, matType: 'iron', matQty: 5 },
-        { id: 3, name: "Gerebek Sarang Naga", duration: 120, reqRank: 'Epic', rewardGems: 100, rewardGold: 8000, matType: 'scale', matQty: 2 }
+    // Enriched Guild Dispatch Missions with Specializations Requirement
+    const dispatchMissions = [
+        { id: 1, name: "Goblin Outpost", duration: 15, reqSpecialization: "Scout", rewardGems: 15, rewardGold: 600, staminaCost: 20 },
+        { id: 2, name: "Dragon Catacombs", duration: 45, reqSpecialization: "Warrior", rewardGems: 50, rewardGold: 3000, staminaCost: 45 },
+        { id: 3, name: "Quantum Rift Abyss", duration: 120, reqSpecialization: "Mage", rewardGems: 150, rewardGold: 12000, staminaCost: 80 }
     ];
+
+    const mercSpecializations = ["Warrior", "Scout", "Mage", "Alchemist"];
 
     async function initFirebase() {
         try {
@@ -658,7 +633,7 @@
                     updateUI();
                     renderRelicsUI();
                     renderGuild();
-                    renderMaterials();
+                    renderMapsUI();
                 }
             }
         }, (error) => {
@@ -720,11 +695,12 @@
         updateUI();
         renderRelicsUI();
         renderGuild();
-        renderMaterials();
+        renderMapsUI();
     }
 
     function showToast(msg) {
         let t = document.getElementById('toast');
+        if(!t) return;
         t.innerText = msg;
         t.style.display = 'block';
         setTimeout(() => t.style.display = 'none', 3500);
@@ -733,9 +709,12 @@
     window.switchTab = function(tabId, btn) {
         document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-        document.getElementById('tab-' + tabId).classList.add('active');
-        btn.classList.add('active');
-        if(tabId === 'guild') renderBountyBoard();
+        let target = document.getElementById('tab-' + tabId);
+        if(target) target.classList.add('active');
+        if(btn) btn.classList.add('active');
+        if(tabId === 'collection') renderRelicsUI();
+        if(tabId === 'guild') renderGuild();
+        if(tabId === 'maps') renderMapsUI();
     }
 
     window.toggleKarma = function() {
@@ -765,8 +744,6 @@
         window.monster.hp = window.monster.maxHp;
         window.monster.goldReward = randM.gold;
         window.monster.xpReward = randM.xp;
-        window.monster.mat = randM.mat;
-        window.monster.matChance = randM.matChance;
 
         let nameEl = document.getElementById('monsterName');
         let spriteEl = document.getElementById('monsterSprite');
@@ -775,30 +752,34 @@
     }
 
     window.handleTap = function(event) {
-        let relicHourglassMult = 1 + (window.game.relics.hourglass.level * 1.0);
-        let damage = window.game.clickPower * (window.game.karma === 'SHADOW' ? 2 : 1) * window.game.mapMultiplier * (1 + window.game.souls * 0.5) * relicHourglassMult;
+        let relicHourglass = window.game.relics.hourglass.unlocked ? (1 + window.game.relics.hourglass.level) : 1;
+        let damage = window.game.clickPower * (window.game.karma === 'SHADOW' ? 2 : 1) * window.game.mapMultiplier * (1 + window.game.souls * 0.5) * relicHourglass;
         if(window.game.frenzyActive) damage *= 5;
 
         window.monster.hp -= damage;
         showFloatingText(event.clientX, event.clientY, `-${Math.round(damage)}`, '#ef4444');
 
-        let orbMult = 1 + (window.game.relics.orb.level * 0.2);
-        window.game.frenzyRage += (4 * orbMult);
-        if(window.game.frenzyRage >= 100 && !window.game.frenzyActive) {
+        window.game.frenzyRage += 4;
+        let berserkBonus = window.game.relics.berserkAmulet.unlocked ? (window.game.relics.berserkAmulet.level * 2) : 0;
+        if(window.game.frenzyRage >= (100 - berserkBonus) && !window.game.frenzyActive) {
             window.game.frenzyActive = true;
-            document.getElementById('arenaBox').style.borderColor = '#f59e0b';
+            let arenaBox = document.getElementById('arenaBox');
+            if(arenaBox) arenaBox.style.borderColor = '#f59e0b';
             setTimeout(() => {
                 window.game.frenzyActive = false;
                 window.game.frenzyRage = 0;
-                document.getElementById('arenaBox').style.borderColor = '#4b5563';
+                let ab = document.getElementById('arenaBox');
+                if(ab) ab.style.borderColor = '#4b5563';
             }, 5000);
         }
 
-        window.game.quantumSync += (2 * orbMult);
+        window.game.quantumSync += 2;
         if(window.game.quantumSync >= 100) {
             window.game.quantumSync = 0;
-            window.game.gems += 5;
-            showToast('✨ QUANTUM PARADOX: +5 Gems!');
+            let coreBonus = window.game.relics.quantumCore.unlocked ? window.game.relics.quantumCore.level : 0;
+            let gainedGems = 5 + coreBonus;
+            window.game.gems += gainedGems;
+            showToast(`✨ QUANTUM PARADOX: +${gainedGems} Gems!`);
         }
 
         if(window.monster.hp <= 0) defeatMonster();
@@ -807,16 +788,22 @@
     }
 
     function defeatMonster() {
-        let relicCrownMult = 1 + (window.game.relics.crown.level * 0.5);
-        let goldGain = window.monster.goldReward * window.game.mapMultiplier * (window.game.karma === 'LIGHT' ? 1.5 : 1) * relicCrownMult;
+        let relicCrown = window.game.relics.crown.unlocked ? (1 + (window.game.relics.crown.level * 0.5)) : 1;
+        let goldGain = window.monster.goldReward * window.game.mapMultiplier * (window.game.karma === 'LIGHT' ? 1.5 : 1) * relicCrown;
         window.game.gold += goldGain;
         window.game.xp += window.monster.xpReward;
+        window.game.monsterDefeatedCount++;
 
-        // Material Travel Drop
-        if(Math.random() < window.monster.matChance) {
-            let matKey = window.monster.mat;
-            window.game.materials[matKey] = (window.game.materials[matKey] || 0) + 1;
-            renderMaterials();
+        if (window.game.mapIndex === 0 && window.game.monsterDefeatedCount % 5 === 0) {
+            window.game.wood += 2;
+            showToast("🪵 Memperoleh +2 Kayu Halus dari Whispering Woods!");
+        } else if (window.game.mapIndex === 1 && window.game.monsterDefeatedCount % 4 === 0) {
+            window.game.stone += 1;
+            window.game.gems += 2;
+            showToast("⛏️ Memperoleh +1 Batu Tambang & +2 Gems!");
+        } else if (window.game.mapIndex === 2 && window.game.monsterDefeatedCount % 3 === 0) {
+            window.game.stone += 2;
+            showToast("🌋 Memperoleh +2 Batu Obsidian dari Magma!");
         }
 
         if(window.game.xp >= window.game.xpMax) {
@@ -830,27 +817,14 @@
         spawnNewMonster();
     }
 
-    function renderMaterials() {
-        let m = window.game.materials;
-        let d = document.getElementById('materialBagDisplay');
-        if(d) {
-            d.innerHTML = `
-                <span>🌿 Forest Herb: ${m.herb || 0}</span>
-                <span>🍄 Mushroom: ${m.mushroom || 0}</span>
-                <span>🪙 Iron Ore: ${m.iron || 0}</span>
-                <span>💎 Crystal: ${m.crystal || 0}</span>
-                <span>🔥 Magma Core: ${m.magma || 0}</span>
-                <span>👑 Dragon Scale: ${m.scale || 0}</span>
-            `;
-        }
-    }
-
     function checkEvolution() {
         let avatars = ['🧑‍🌾', '🗡️', '🧙‍♂️', '👼'];
         let classes = ['Peasant', 'Squire', 'Mage', 'Demigod'];
         let idx = Math.min(Math.floor(window.game.level / 25), 3);
-        document.getElementById('heroAvatar').innerText = avatars[idx];
-        document.getElementById('heroClass').innerText = classes[idx];
+        let avatarEl = document.getElementById('heroAvatar');
+        let classEl = document.getElementById('heroClass');
+        if(avatarEl) avatarEl.innerText = avatars[idx];
+        if(classEl) classEl.innerText = classes[idx];
     }
 
     function showFloatingText(x, y, text, color) {
@@ -896,21 +870,48 @@
         }
         window.game.mapIndex = idx;
         window.game.mapMultiplier = mults[idx];
-        document.getElementById('mapTitle').innerText = `Map: ${names[idx]}`;
+        let mapTitle = document.getElementById('mapTitle');
+        if(mapTitle) mapTitle.innerText = `Map: ${names[idx]}`;
         spawnNewMonster();
+        renderMapsUI();
         updateUI();
         triggerSave();
     }
 
-    window.buyOrUpgradeRelic = function(relicKey, baseCost) {
-        let relic = window.game.relics[relicKey];
-        let currentLvl = relic.level;
-        let cost = Math.round(baseCost * Math.pow(1.5, currentLvl));
+    function renderMapsUI() {
+        for (let i = 0; i < 3; i++) {
+            let btn = document.getElementById(`mapBtn${i}`);
+            if (!btn) continue;
+            if (window.game.mapIndex === i) {
+                btn.innerText = "Active";
+                btn.className = "btn btn-success";
+            } else {
+                let reqLvl = i === 1 ? 25 : i === 2 ? 50 : 1;
+                if (window.game.level >= reqLvl) {
+                    btn.innerText = "Travel";
+                    btn.className = "btn";
+                } else {
+                    btn.innerText = `Req Lv ${reqLvl}`;
+                    btn.className = "btn";
+                    btn.style.background = "#4b5563";
+                }
+            }
+        }
+    }
 
-        if(window.game.gems >= cost) {
+    window.upgradeRelic = function(relicKey) {
+        let relic = window.game.relics[relicKey];
+        let cost = relic.cost * (relic.level + 1);
+        
+        if (window.game.gems >= cost) {
             window.game.gems -= cost;
-            relic.level++;
-            showToast(`Relic ${relicKey.toUpperCase()} berhasil ditingkatkan ke Level ${relic.level}!`);
+            if (!relic.unlocked) {
+                relic.unlocked = true;
+                relic.level = 1;
+            } else {
+                relic.level++;
+            }
+            showToast(`Berhasil upgrade ${relic.name} ke Level ${relic.level}!`);
             renderRelicsUI();
             updateUI();
             triggerSave();
@@ -920,19 +921,24 @@
     }
 
     function renderRelicsUI() {
-        for(let key in window.game.relics) {
+        let list = document.getElementById('collectionList');
+        if (!list) return;
+        list.innerHTML = '';
+        
+        for (let key in window.game.relics) {
             let r = window.game.relics[key];
-            let lvlEl = document.getElementById(`relicLvl-${key}`);
-            let btnEl = document.getElementById(`btn${key.charAt(0).toUpperCase() + key.slice(1)}`);
-            if(lvlEl) lvlEl.innerText = `(Lv. ${r.level})`;
-            if(btnEl) {
-                if(r.level === 0) {
-                    btnEl.innerText = `Unlock (${r.baseCost} 💎)`;
-                } else {
-                    let nextCost = Math.round(r.baseCost * Math.pow(1.5, r.level));
-                    btnEl.innerText = `Upgrade (${nextCost} 💎)`;
-                }
-            }
+            let nextCost = r.cost * (r.level + 1);
+            let btnText = !r.unlocked ? `Unlock (${r.cost} 💎)` : `Upgrade Lv.${r.level} (${nextCost} 💎)`;
+            
+            list.innerHTML += `
+                <div class="collection-card">
+                    <div>
+                        <h4>${r.name} ${r.unlocked ? `(Lv. ${r.level})` : ''}</h4>
+                        <p style="font-size: 11px; color: #9ca3af;">${r.desc}</p>
+                    </div>
+                    <button class="btn btn-success" onclick="upgradeRelic('${key}')">${btnText}</button>
+                </div>
+            `;
         }
     }
 
@@ -943,31 +949,29 @@
             window.game.chestCost = Math.round(window.game.chestCost * 1.4);
 
             let rng = Math.random();
-            if(rng < 0.5) {
+            if(rng < 0.45) {
                 let reward = 400 * window.game.chestsBought;
                 window.game.gold += reward;
                 showToast(`Mendapat ${reward} Gold dari Mystic Chest!`);
-            } else if(rng < 0.8) {
+            } else if(rng < 0.75) {
                 window.game.gems += 15;
                 showToast(`Langka! Mendapat 15 Gems!`);
             } else {
                 let ranks = ['Common', 'Rare', 'Epic', 'Legendary'];
                 let rank = ranks[Math.floor(Math.random() * ranks.length)];
-                let specs = ['Tracker (Bonus Gems)', 'Guardian (Stamina Cepat)', 'Assassin (Bonus Gold)'];
-                let spec = specs[Math.floor(Math.random() * specs.length)];
-
+                let spec = mercSpecializations[Math.floor(Math.random() * mercSpecializations.length)];
+                
                 window.game.mercenaries.push({ 
                     id: Date.now() + Math.random(),
-                    name: 'Merc #' + (window.game.mercenaries.length + 1), 
+                    name: 'Mercenary #' + (window.game.mercenaries.length + 1), 
                     rank: rank,
-                    spec: spec,
+                    specialization: spec,
                     stamina: 100,
-                    maxStamina: 100,
                     status: 'IDLE',
-                    bountyId: null,
+                    missionId: null,
                     finishTime: 0
                 });
-                showToast(`EPIC DROP! Merekrut Mercenary [${rank}] (${spec})!`);
+                showToast(`RECRUIT DROPPED! Mercenary [${rank}] Spesialisasi [${spec}] bergabung!`);
                 renderGuild();
             }
         } else {
@@ -975,20 +979,6 @@
         }
         updateUI();
         triggerSave();
-    }
-
-    function renderBountyBoard() {
-        let board = document.getElementById('bountyBoardList');
-        if(!board) return;
-        board.innerHTML = guildBounties.map(b => `
-            <div style="background:#111827; padding:8px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
-                <div>
-                    <strong style="color:#f3f4f6;">${b.name}</strong>
-                    <div style="color:#9ca3af;">⏱️ ${b.duration}s | Req Rank: ${b.reqRank}</div>
-                    <div style="color:#38bdf8;">Hadiah: ${b.rewardGems} 💎, ${b.rewardGold} 💰 & ${b.matQty}x Material</div>
-                </div>
-            </div>
-        `).join('');
     }
 
     window.renderGuild = function() {
@@ -1005,20 +995,27 @@
             let actionHtml = '';
 
             if (m.status === 'IDLE') {
-                actionHtml = `
-                    <div style="display: flex; gap: 4px; margin-top: 6px; align-items: center;">
-                        <select id="bounty-select-${m.id}" style="background: #374151; color: #fff; border: none; padding: 4px; border-radius: 6px; font-size: 11px;">
-                            ${guildBounties.map(b => `<option value="${b.id}">${b.name} (${b.duration}s)</option>`).join('')}
-                        </select>
-                        <button class="btn btn-yellow" style="padding: 4px 8px; font-size: 11px;" onclick="startBounty('${m.id}')">Kirim Misi</button>
-                    </div>
-                `;
-            } else if (m.status === 'ON_MISSION') {
+                if (m.stamina < 30) {
+                    actionHtml = `
+                        <p style="font-size: 11px; color: #ef4444; margin-top: 4px;">⚠️ Stamina Rendah (${m.stamina}%). Istirahat di Markas...</p>
+                        <button class="btn btn-purple" style="padding: 4px 8px; font-size: 11px; margin-top: 4px;" onclick="restMercenary('${m.id}')">🛌 Pulihkan Stamina (+50)</button>
+                    `;
+                } else {
+                    actionHtml = `
+                        <div style="display: flex; gap: 4px; margin-top: 6px; width: 100%;">
+                            <select id="mission-select-${m.id}" style="background: #374151; color: #fff; border: none; padding: 4px; border-radius: 6px; font-size: 11px; flex: 1;">
+                                ${dispatchMissions.map(mis => `<option value="${mis.id}">${mis.name} (Req:${mis.reqSpecialization})</option>`).join('')}
+                            </select>
+                            <button class="btn btn-yellow" style="padding: 4px 8px; font-size: 11px;" onclick="startDispatch('${m.id}')">Kirim</button>
+                        </div>
+                    `;
+                }
+            } else if (m.status === 'DISPATCHED') {
                 let timeLeft = Math.max(0, Math.ceil((m.finishTime - now) / 1000));
                 if (timeLeft > 0) {
-                    actionHtml = `<p style="font-size: 11px; color: #f59e0b; margin-top: 4px;">⏳ Misi Berjalan... Sisa ${timeLeft}s</p>`;
+                    actionHtml = `<p style="font-size: 11px; color: #f59e0b; margin-top: 4px;">⏳ Misi Ekspedisi... Sisa ${timeLeft}s</p>`;
                 } else {
-                    actionHtml = `<button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-top: 4px;" onclick="claimBounty('${m.id}')">🎁 Klaim Bounty</button>`;
+                    actionHtml = `<button class="btn btn-success" style="padding: 4px 8px; font-size: 11px; margin-top: 4px;" onclick="claimDispatch('${m.id}')">🎁 Klaim Hadiah Ekspedisi</button>`;
                 }
             }
 
@@ -1026,151 +1023,204 @@
                 <div class="guild-card" style="flex-direction: column; align-items: flex-start; gap: 4px;">
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                         <h4 style="font-size: 13px;">${m.name} <span style="font-size: 10px; color: ${rankColor};">[${m.rank}]</span></h4>
-                        <span style="font-size: 10px; color: #38bdf8;">⚡ Stamina: ${Math.round(m.stamina)}/${m.maxStamina}</span>
+                        <span style="font-size: 10px; color: #38bdf8;">Spesialisasi: ${m.specialization}</span>
                     </div>
-                    <div style="font-size: 10px; color: #9ca3af;">Spesialisasi: <strong>${m.spec}</strong> | Status: ${m.status}</div>
+                    <div style="font-size: 11px; color: #9ca3af; width: 100%; display: flex; justify-content: space-between;">
+                        <span>Stamina: ${m.stamina}%</span>
+                        <span>Status: ${m.status}</span>
+                    </div>
+                    <div style="width: 100%; background: #374151; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 2px;">
+                        <div style="background: ${m.stamina > 30 ? '#10b981' : '#ef4444'}; width: ${m.stamina}%; height: 100%;"></div>
+                    </div>
                     ${actionHtml}
                 </div>
             `;
         });
     }
 
-    window.startBounty = function(mercId) {
+    window.restMercenary = function(mercId) {
         let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
-        if (!m || m.status !== 'IDLE') return;
-
-        if (m.stamina < 30) {
-            showToast("Stamina mercenary terlalu rendah! Tunggu pemulihan stamina.");
-            return;
-        }
-
-        let selectEl = document.getElementById(`bounty-select-${mercId}`);
-        let bountyId = parseInt(selectEl.value);
-        let bounty = guildBounties.find(b => b.id === bountyId);
-
-        m.stamina -= 30;
-        m.status = 'ON_MISSION';
-        m.bountyId = bountyId;
-        m.finishTime = Date.now() + (bounty.duration * 1000);
-
-        showToast(`${m.name} dikirim menjalankan ${bounty.name}!`);
+        if (!m) return;
+        m.stamina = Math.min(100, m.stamina + 50);
+        showToast(`${m.name} telah pulih staminanya!`);
         renderGuild();
         triggerSave();
     }
 
-    window.claimBounty = function(mercId) {
+    window.startDispatch = function(mercId) {
         let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
-        if (!m || m.status !== 'ON_MISSION') return;
+        if (!m || m.status !== 'IDLE') return;
 
-        let bounty = guildBounties.find(b => b.id === m.bountyId);
+        let selectEl = document.getElementById(`mission-select-${mercId}`);
+        if (!selectEl) return;
+        let missionId = parseInt(selectEl.value);
+        let mission = dispatchMissions.find(mis => mis.id === missionId);
+
+        if (m.stamina < mission.staminaCost) {
+            showToast("Stamina mercenary tidak cukup untuk misi ini! Istirahatkan dulu.");
+            return;
+        }
+
+        m.stamina -= mission.staminaCost;
+        m.status = 'DISPATCHED';
+        m.missionId = missionId;
+        m.finishTime = Date.now() + (mission.duration * 1000);
+
+        showToast(`${m.name} memulai ekspedisi ke ${mission.name}!`);
+        renderGuild();
+        triggerSave();
+    }
+
+    window.claimDispatch = function(mercId) {
+        let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
+        if (!m || m.status !== 'DISPATCHED') return;
+
+        let mission = dispatchMissions.find(mis => mis.id === m.missionId);
+        if(!mission) return;
+        
         let rankMult = m.rank === 'Legendary' ? 3 : m.rank === 'Epic' ? 2 : m.rank === 'Rare' ? 1.5 : 1;
-        let specMult = m.spec.includes('Tracker') ? 1.5 : 1;
+        let bonusMatch = m.specialization === mission.reqSpecialization ? 1.5 : 1.0;
 
-        let gemsEarned = Math.round(bounty.rewardGems * rankMult * specMult);
-        let goldEarned = Math.round(bounty.rewardGold * rankMult);
+        let earnedGems = Math.round(mission.rewardGems * rankMult * bonusMatch);
+        let earnedGold = Math.round(mission.rewardGold * rankMult * bonusMatch);
 
-        window.game.gems += gemsEarned;
-        window.game.gold += goldEarned;
-        window.game.materials[bounty.matType] = (window.game.materials[bounty.matType] || 0) + bounty.matQty;
+        window.game.gems += earnedGems;
+        window.game.gold += earnedGold;
 
         m.status = 'IDLE';
-        m.bountyId = null;
+        m.missionId = null;
         m.finishTime = 0;
 
-        showToast(`Bounty Berhasil! +${gemsEarned} 💎, +${goldEarned} 💰 & Material!`);
+        showToast(`🎉 Ekspedisi Selesai! Mendapat +${earnedGems} 💎 & +${earnedGold} 💰`);
         renderGuild();
-        renderMaterials();
         updateUI();
         triggerSave();
     }
 
     window.doAscension = function() {
         if(window.game.level < 50) {
-            showToast("Butuh Level 50 untuk Ascension!");
+            showToast("Butuh Level 50 untuk melakukan Ascension!");
             return;
         }
-        window.game.souls += Math.floor(window.game.level / 10);
+        let soulsGained = Math.floor(window.game.level / 10);
+        window.game.souls += soulsGained;
         window.game.level = 1;
         window.game.xp = 0;
         window.game.xpMax = 50;
         window.game.gold = 0;
         window.game.clickPower = 1;
         window.game.dps = 0;
-        window.game.bankGold = 0;
-        showToast(`Ascension Berhasil! +${window.game.souls} Souls permanen!`);
+        window.game.clickLvl = 1;
+        window.game.dpsLvl = 0;
+        window.game.clickCost = 20;
+        window.game.dpsCost = 50;
+        
+        showToast(`🌌 ASCENSION BERHASIL! Mendapat +${soulsGained} Hero Souls!`);
         checkEvolution();
         spawnNewMonster();
         updateUI();
         triggerSave();
     }
 
-    // Tick Loop
-    setInterval(() => {
-        if(window.game.dps > 0) {
-            window.monster.hp -= (window.game.dps * window.game.mapMultiplier);
-            if(window.monster.hp <= 0) defeatMonster();
-        }
-        if(window.game.bankGold > 0) {
-            window.game.gold += window.game.bankGold;
-        }
-
-        // Regenerate Stamina Mercenaries & check timer
-        let needsGuildRender = false;
-        window.game.mercenaries.forEach(m => {
-            if (m.stamina < m.maxStamina && m.status === 'IDLE') {
-                m.stamina = Math.min(m.maxStamina, m.stamina + 1);
-                needsGuildRender = true;
-            }
-            if(m.status === 'ON_MISSION' && Date.now() >= m.finishTime) {
-                needsGuildRender = true;
-            }
-        });
-        if(needsGuildRender) renderGuild();
-
-        document.getElementById('ghostStatus').innerText = `Echo DPS: +${window.game.dps * 2} (Active)`;
-        document.getElementById('presentDps').innerText = `DPS: ${window.game.dps} | Bank: +${window.game.bankGold}/s`;
-
-        if(!window.game.frenzyActive && window.game.frenzyRage > 0) {
-            window.game.frenzyRage = Math.max(0, window.game.frenzyRage - 1);
-        }
-        updateUI();
-    }, 1000);
-
     function updateUI() {
-        document.getElementById('goldDisplay').innerText = Math.round(window.game.gold);
-        document.getElementById('gemsDisplay').innerText = window.game.gems;
-        document.getElementById('soulsDisplay').innerText = window.game.souls;
-        document.getElementById('heroLevel').innerText = window.game.level;
-        document.getElementById('heroXp').innerText = window.game.xp;
-        document.getElementById('heroXpMax').innerText = window.game.xpMax;
-        
-        document.getElementById('monsterHp').innerText = Math.max(0, Math.round(window.monster.hp));
-        document.getElementById('monsterHpMax').innerText = window.monster.maxHp;
-        let hpPercent = Math.max(0, (window.monster.hp / window.monster.maxHp) * 100);
-        document.getElementById('hpBar').style.width = hpPercent + '%';
+        let elGold = document.getElementById('goldDisplay');
+        let elGems = document.getElementById('gemsDisplay');
+        let elSouls = document.getElementById('soulsDisplay');
+        let elWood = document.getElementById('woodDisplay');
+        let elStone = document.getElementById('stoneDisplay');
+        let elLevel = document.getElementById('heroLevel');
+        let elXp = document.getElementById('heroXp');
+        let elXpMax = document.getElementById('heroXpMax');
+        let elMonsterHp = document.getElementById('monsterHp');
+        let elMonsterHpMax = document.getElementById('monsterHpMax');
+        let hpBar = document.getElementById('hpBar');
+        let frenzyfill = document.getElementById('frenzyfill');
+        let frenzyText = document.getElementById('frenzyText');
+        let quantumFill = document.getElementById('quantum-fill');
+        let quantumText = document.getElementById('quantumText');
+        let presentDps = document.getElementById('presentDps');
+        let ghostStatus = document.getElementById('ghostStatus');
 
-        document.getElementById('lvlClick').innerText = window.game.clickLvl;
-        document.getElementById('incClick').innerText = window.game.clickPower;
-        document.getElementById('costClick').innerText = window.game.clickCost;
+        if(elGold) elGold.innerText = Math.floor(window.game.gold).toLocaleString();
+        if(elGems) elGems.innerText = window.game.gems.toLocaleString();
+        if(elSouls) elSouls.innerText = window.game.souls.toLocaleString();
+        if(elWood) elWood.innerText = window.game.wood.toLocaleString();
+        if(elStone) elStone.innerText = window.game.stone.toLocaleString();
+        if(elLevel) elLevel.innerText = window.game.level;
+        if(elXp) elXp.innerText = window.game.xp;
+        if(elXpMax) elXpMax.innerText = window.game.xpMax;
 
-        document.getElementById('lvlDps').innerText = window.game.dpsLvl;
-        document.getElementById('incDps').innerText = window.game.dps;
-        document.getElementById('costDps').innerText = window.game.dpsCost;
+        if(elMonsterHp) elMonsterHp.innerText = Math.max(0, Math.ceil(window.monster.hp));
+        if(elMonsterHpMax) elMonsterHpMax.innerText = window.monster.maxHp;
+        if(hpBar) {
+            let pct = Math.max(0, (window.monster.hp / window.monster.maxHp) * 100);
+            hpBar.style.width = pct + '%';
+        }
 
-        document.getElementById('lvlBank').innerText = window.game.bankLvl;
-        document.getElementById('incBank').innerText = window.game.bankGold;
-        document.getElementById('costBank').innerText = window.game.bankCost;
+        if(frenzyfill) frenzyfill.style.width = window.game.frenzyRage + '%';
+        if(frenzyText) frenzyText.innerText = window.game.frenzyRage + '%';
+        if(quantumFill) quantumFill.style.width = window.game.quantumSync + '%';
+        if(quantumText) quantumText.innerText = window.game.quantumSync + '%';
 
-        document.getElementById('chestCost').innerText = window.game.chestCost;
+        let totalDps = window.game.dps * window.game.mapMultiplier * (1 + window.game.souls * 0.5);
+        if(presentDps) presentDps.innerText = `DPS: ${Math.round(totalDps)}`;
+        if(ghostStatus) ghostStatus.innerText = window.game.mercenaries.length > 0 ? "Active (Guild Synergy)" : "Standby (No Mercs)";
 
-        document.getElementById('frenzyfill').style.width = window.game.frenzyRage + '%';
-        document.getElementById('frenzyText').innerText = window.game.frenzyRage + '%';
-        document.getElementById('quantum-fill').style.width = window.game.quantumSync + '%';
-        document.getElementById('quantumText').innerText = window.game.quantumSync + '%';
+        // Training Upgrades UI
+        let lvlClick = document.getElementById('lvlClick');
+        let incClick = document.getElementById('incClick');
+        let costClick = document.getElementById('costClick');
+        if(lvlClick) lvlClick.innerText = window.game.clickLvl;
+        if(incClick) incClick.innerText = 1;
+        if(costClick) costClick.innerText = window.game.clickCost;
+
+        let lvlDps = document.getElementById('lvlDps');
+        let incDps = document.getElementById('incDps');
+        let costDps = document.getElementById('costDps');
+        if(lvlDps) lvlDps.innerText = window.game.dpsLvl;
+        if(incDps) incDps.innerText = 1;
+        if(costDps) costDps.innerText = window.game.dpsCost;
+
+        let lvlBank = document.getElementById('lvlBank');
+        let incBank = document.getElementById('incBank');
+        let costBank = document.getElementById('costBank');
+        if(lvlBank) lvlBank.innerText = window.game.bankLvl;
+        if(incBank) incBank.innerText = 5;
+        if(costBank) costBank.innerText = window.game.bankCost;
+
+        let chestCostEl = document.getElementById('chestCost');
+        if(chestCostEl) chestCostEl.innerText = window.game.chestCost;
     }
 
-    initFirebase();
-    loadLocal();
+    // Game Loops (DPS, Bank Idle, UI Updates)
+    setInterval(() => {
+        // Auto DPS
+        let totalDps = window.game.dps * window.game.mapMultiplier * (1 + window.game.souls * 0.5);
+        if(totalDps > 0) {
+            window.monster.hp -= totalDps / 10;
+            if(window.monster.hp <= 0) {
+                defeatMonster();
+            }
+        }
+        // Bank Idle Gold
+        if(window.game.bankGold > 0) {
+            window.game.gold += window.game.bankGold / 10;
+        }
+        updateUI();
+    }, 100);
+
+    // Auto save interval & Guild countdown refresh
+    setInterval(() => {
+        triggerSave();
+        if(document.getElementById('tab-guild') && document.getElementById('tab-guild').classList.contains('active')) {
+            renderGuild();
+        }
+    }, 1000);
+
+    window.onload = function() {
+        initFirebase();
+        loadLocal();
+    };
 </script>
 </body>
 </html>
