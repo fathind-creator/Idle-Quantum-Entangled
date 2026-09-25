@@ -283,7 +283,6 @@
 <body>
 
 <div class="game-container" id="gameContainer">
-    <!-- TOP STATS BAR -->
     <div class="header-stats">
         <div class="stat-badge">💰 <span id="goldDisplay">0</span></div>
         <div class="stat-badge">💎 <span id="gemsDisplay">0</span> <span id="syncIndicator" title="Cloud Sync Realtime">☁️</span></div>
@@ -526,7 +525,7 @@
 
     window.game = JSON.parse(JSON.stringify(defaultGameStructure));
 
-    // Sanitizer to prevent NaN across all game properties
+    // Comprehensive Sanitizer to prevent any NaN propagation across properties
     function sanitizeGameData(importedData) {
         if (!importedData || typeof importedData !== 'object') return;
         for (let key in defaultGameStructure) {
@@ -536,11 +535,12 @@
                         if (importedData.relics[rKey]) {
                             window.game.relics[rKey].level = Number(importedData.relics[rKey].level) || 0;
                             window.game.relics[rKey].unlocked = Boolean(importedData.relics[rKey].unlocked);
+                            window.game.relics[rKey].cost = Number(importedData.relics[rKey].cost) || defaultGameStructure.relics[rKey].cost;
                         }
                     }
                 } else if (key === 'mercenaries' && Array.isArray(importedData[key])) {
                     window.game.mercenaries = importedData[key].map(m => ({
-                        id: m.id || Math.random(),
+                        id: m.id || ('merc_' + Date.now() + '_' + Math.random()),
                         name: m.name || 'Mercenary',
                         rank: m.rank || 'Common',
                         specialization: m.specialization || 'Warrior',
@@ -809,33 +809,38 @@
     }
 
     window.handleTap = function(event) {
-        let relicHourglass = window.game.relics.hourglass.unlocked ? (1 + window.game.relics.hourglass.level) : 1;
-        let damage = (window.game.clickPower || 1) * (window.game.karma === 'SHADOW' ? 2 : 1) * (window.game.mapMultiplier || 1) * (1 + (window.game.souls || 0) * 0.5) * relicHourglass;
+        let relicHourglass = window.game.relics.hourglass.unlocked ? (1 + Number(window.game.relics.hourglass.level)) : 1;
+        let damage = (Number(window.game.clickPower) || 1) * (window.game.karma === 'SHADOW' ? 2 : 1) * (Number(window.game.mapMultiplier) || 1) * (1 + (Number(window.game.souls) || 0) * 0.5) * relicHourglass;
         if(window.game.frenzyActive) damage *= 5;
 
         window.monster.hp -= damage;
         showFloatingText(event.clientX, event.clientY, `-${Math.round(damage)}`, '#ef4444');
 
-        window.game.frenzyRage = (window.game.frenzyRage || 0) + 4;
-        let berserkBonus = window.game.relics.berserkAmulet.unlocked ? (window.game.relics.berserkAmulet.level * 2) : 0;
-        if(window.game.frenzyRage >= (100 - berserkBonus) && !window.game.frenzyActive) {
+        // Fixed Hectic Frenzy Rage accumulation logic (capped properly to 100)
+        window.game.frenzyRage = (Number(window.game.frenzyRage) || 0) + 4;
+        let berserkBonus = window.game.relics.berserkAmulet.unlocked ? (Number(window.game.relics.berserkAmulet.level) * 2) : 0;
+        let frenzyThreshold = Math.max(20, 100 - berserkBonus);
+
+        if(window.game.frenzyRage >= frenzyThreshold && !window.game.frenzyActive) {
             window.game.frenzyActive = true;
+            window.game.frenzyRage = 100;
             let arenaBox = document.getElementById('arenaBox');
             if(arenaBox) arenaBox.style.borderColor = '#f59e0b';
+            showToast("⚡ HECTIC FRENZY RAGE DIAKTIFKAN! Damage x5!");
             setTimeout(() => {
                 window.game.frenzyActive = false;
                 window.game.frenzyRage = 0;
                 let ab = document.getElementById('arenaBox');
                 if(ab) ab.style.borderColor = '#4b5563';
-            }, 5000);
+            }, 6000);
         }
 
-        window.game.quantumSync = (window.game.quantumSync || 0) + 2;
+        window.game.quantumSync = (Number(window.game.quantumSync) || 0) + 2;
         if(window.game.quantumSync >= 100) {
             window.game.quantumSync = 0;
-            let coreBonus = window.game.relics.quantumCore.unlocked ? window.game.relics.quantumCore.level : 0;
+            let coreBonus = window.game.relics.quantumCore.unlocked ? Number(window.game.relics.quantumCore.level) : 0;
             let gainedGems = 5 + coreBonus;
-            window.game.gems = (window.game.gems || 0) + gainedGems;
+            window.game.gems = (Number(window.game.gems) || 0) + gainedGems;
             showToast(`✨ QUANTUM PARADOX: +${gainedGems} Gems!`);
         }
 
@@ -845,26 +850,26 @@
     }
 
     function defeatMonster() {
-        let relicCrown = window.game.relics.crown.unlocked ? (1 + (window.game.relics.crown.level * 0.5)) : 1;
-        let goldGain = window.monster.goldReward * (window.game.mapMultiplier || 1) * (window.game.karma === 'LIGHT' ? 1.5 : 1) * relicCrown;
-        window.game.gold = (window.game.gold || 0) + goldGain;
-        window.game.xp = (window.game.xp || 0) + window.monster.xpReward;
-        window.game.monsterDefeatedCount = (window.game.monsterDefeatedCount || 0) + 1;
+        let relicCrown = window.game.relics.crown.unlocked ? (1 + (Number(window.game.relics.crown.level) * 0.5)) : 1;
+        let goldGain = window.monster.goldReward * (Number(window.game.mapMultiplier) || 1) * (window.game.karma === 'LIGHT' ? 1.5 : 1) * relicCrown;
+        window.game.gold = (Number(window.game.gold) || 0) + goldGain;
+        window.game.xp = (Number(window.game.xp) || 0) + window.monster.xpReward;
+        window.game.monsterDefeatedCount = (Number(window.game.monsterDefeatedCount) || 0) + 1;
 
         if (window.game.mapIndex === 0 && window.game.monsterDefeatedCount % 5 === 0) {
-            window.game.wood = (window.game.wood || 0) + 2;
+            window.game.wood = (Number(window.game.wood) || 0) + 2;
             showToast("🪵 Memperoleh +2 Kayu Halus dari Whispering Woods!");
         } else if (window.game.mapIndex === 1 && window.game.monsterDefeatedCount % 4 === 0) {
-            window.game.stone = (window.game.stone || 0) + 1;
-            window.game.gems = (window.game.gems || 0) + 2;
+            window.game.stone = (Number(window.game.stone) || 0) + 1;
+            window.game.gems = (Number(window.game.gems) || 0) + 2;
             showToast("⛏️ Memperoleh +1 Batu Tambang & +2 Gems!");
         } else if (window.game.mapIndex === 2 && window.game.monsterDefeatedCount % 3 === 0) {
-            window.game.stone = (window.game.stone || 0) + 2;
+            window.game.stone = (Number(window.game.stone) || 0) + 2;
             showToast("🌋 Memperoleh +2 Batu Obsidian dari Magma!");
         }
 
         if(window.game.xp >= window.game.xpMax) {
-            window.game.level++;
+            window.game.level = (Number(window.game.level) || 1) + 1;
             window.game.xp = 0;
             window.game.xpMax = Math.round(window.game.xpMax * 1.3);
             checkEvolution();
@@ -877,7 +882,7 @@
     function checkEvolution() {
         let avatars = ['🧑‍🌾', '🗡️', '🧙‍♂️', '👼'];
         let classes = ['Peasant', 'Squire', 'Mage', 'Demigod'];
-        let idx = Math.min(Math.floor((window.game.level || 1) / 25), 3);
+        let idx = Math.min(Math.floor((Number(window.game.level) || 1) / 25), 3);
         let avatarEl = document.getElementById('heroAvatar');
         let classEl = document.getElementById('heroClass');
         if(avatarEl) avatarEl.innerText = avatars[idx];
@@ -898,18 +903,18 @@
     window.buyUpgrade = function(type) {
         if(type === 'click' && window.game.gold >= window.game.clickCost) {
             window.game.gold -= window.game.clickCost;
-            window.game.clickLvl = (window.game.clickLvl || 1) + 1;
-            window.game.clickPower = (window.game.clickPower || 1) + 1;
+            window.game.clickLvl = (Number(window.game.clickLvl) || 1) + 1;
+            window.game.clickPower = (Number(window.game.clickPower) || 1) + 1;
             window.game.clickCost = Math.round(window.game.clickCost * 1.35);
         } else if(type === 'dps' && window.game.gold >= window.game.dpsCost) {
             window.game.gold -= window.game.dpsCost;
-            window.game.dpsLvl = (window.game.dpsLvl || 0) + 1;
-            window.game.dps = (window.game.dps || 0) + 1;
+            window.game.dpsLvl = (Number(window.game.dpsLvl) || 0) + 1;
+            window.game.dps = (Number(window.game.dps) || 0) + 1;
             window.game.dpsCost = Math.round(window.game.dpsCost * 1.35);
         } else if(type === 'bank' && window.game.gold >= window.game.bankCost) {
             window.game.gold -= window.game.bankCost;
-            window.game.bankLvl = (window.game.bankLvl || 0) + 1;
-            window.game.bankGold = (window.game.bankGold || 0) + 5;
+            window.game.bankLvl = (Number(window.game.bankLvl) || 0) + 1;
+            window.game.bankGold = (Number(window.game.bankGold) || 0) + 5;
             window.game.bankCost = Math.round(window.game.bankCost * 1.4);
         }
         updateUI();
@@ -921,7 +926,7 @@
         let names = ['Whispering Woods', 'Goblin Caves', 'Cursed Volcano'];
         let mults = [1, 3, 10];
 
-        if(window.game.level < reqLvl) {
+        if((Number(window.game.level) || 1) < reqLvl) {
             showToast(`Level belum mencukupi! Butuh Level ${reqLvl}`);
             return;
         }
@@ -944,7 +949,7 @@
                 btn.className = "btn btn-success";
             } else {
                 let reqLvl = i === 1 ? 25 : i === 2 ? 50 : 1;
-                if (window.game.level >= reqLvl) {
+                if ((Number(window.game.level) || 1) >= reqLvl) {
                     btn.innerText = "Travel";
                     btn.className = "btn";
                 } else {
@@ -958,16 +963,15 @@
 
     window.upgradeRelic = function(relicKey) {
         let relic = window.game.relics[relicKey];
-        let cost = relic.cost * ((relic.level || 0) + 1);
+        if(!relic) return;
+        let currentLvl = Number(relic.level) || 0;
+        let baseCost = Number(relic.cost) || 50;
+        let cost = baseCost * (currentLvl + 1);
         
-        if (window.game.gems >= cost) {
+        if ((Number(window.game.gems) || 0) >= cost) {
             window.game.gems -= cost;
-            if (!relic.unlocked) {
-                relic.unlocked = true;
-                relic.level = 1;
-            } else {
-                relic.level = (relic.level || 0) + 1;
-            }
+            relic.unlocked = true;
+            relic.level = currentLvl + 1;
             showToast(`Berhasil upgrade ${relic.name} ke Level ${relic.level}!`);
             renderRelicsUI();
             updateUI();
@@ -984,13 +988,15 @@
         
         for (let key in window.game.relics) {
             let r = window.game.relics[key];
-            let nextCost = r.cost * ((r.level || 0) + 1);
-            let btnText = !r.unlocked ? `Unlock (${r.cost} 💎)` : `Upgrade Lv.${r.level} (${nextCost} 💎)`;
+            let currentLvl = Number(r.level) || 0;
+            let baseCost = Number(r.cost) || 50;
+            let nextCost = baseCost * (currentLvl + 1);
+            let btnText = !r.unlocked ? `Unlock (${baseCost} 💎)` : `Upgrade Lv.${currentLvl} (${nextCost} 💎)`;
             
             list.innerHTML += `
                 <div class="collection-card">
                     <div>
-                        <h4>${r.name} ${r.unlocked ? `(Lv. ${r.level})` : ''}</h4>
+                        <h4>${r.name} ${r.unlocked ? `(Lv. ${currentLvl})` : ''}</h4>
                         <p style="font-size: 11px; color: #9ca3af;">${r.desc}</p>
                     </div>
                     <button class="btn btn-success" onclick="upgradeRelic('${key}')">${btnText}</button>
@@ -1000,26 +1006,28 @@
     }
 
     window.openChest = function() {
-        if(window.game.gold >= window.game.chestCost) {
-            window.game.gold -= window.game.chestCost;
-            window.game.chestsBought = (window.game.chestsBought || 0) + 1;
-            window.game.chestCost = Math.round(window.game.chestCost * 1.4);
+        let chestCost = Number(window.game.chestCost) || 500;
+        if((Number(window.game.gold) || 0) >= chestCost) {
+            window.game.gold -= chestCost;
+            window.game.chestsBought = (Number(window.game.chestsBought) || 0) + 1;
+            window.game.chestCost = Math.round(chestCost * 1.4);
 
             let rng = Math.random();
             if(rng < 0.45) {
                 let reward = 400 * window.game.chestsBought;
-                window.game.gold += reward;
+                window.game.gold = (Number(window.game.gold) || 0) + reward;
                 showToast(`Mendapat ${reward} Gold dari Mystic Chest!`);
             } else if(rng < 0.75) {
-                window.game.gems = (window.game.gems || 0) + 15;
+                window.game.gems = (Number(window.game.gems) || 0) + 15;
                 showToast(`Langka! Mendapat 15 Gems!`);
             } else {
                 let ranks = ['Common', 'Rare', 'Epic', 'Legendary'];
                 let rank = ranks[Math.floor(Math.random() * ranks.length)];
                 let spec = mercSpecializations[Math.floor(Math.random() * mercSpecializations.length)];
                 
+                if(!Array.isArray(window.game.mercenaries)) window.game.mercenaries = [];
                 window.game.mercenaries.push({ 
-                    id: Date.now() + Math.random(),
+                    id: 'merc_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
                     name: 'Mercenary #' + (window.game.mercenaries.length + 1), 
                     rank: rank,
                     specialization: spec,
@@ -1050,11 +1058,12 @@
             let rankColor = m.rank === 'Legendary' ? '#eab308' : m.rank === 'Epic' ? '#a855f7' : m.rank === 'Rare' ? '#3b82f6' : '#9ca3af';
             let now = Date.now();
             let actionHtml = '';
+            let currentStamina = Number(m.stamina) || 0;
 
             if (m.status === 'IDLE') {
-                if (m.stamina < 30) {
+                if (currentStamina < 30) {
                     actionHtml = `
-                        <p style="font-size: 11px; color: #ef4444; margin-top: 4px;">⚠️ Stamina Rendah (${m.stamina}%). Istirahat di Markas...</p>
+                        <p style="font-size: 11px; color: #ef4444; margin-top: 4px;">⚠️ Stamina Rendah (${currentStamina}%). Istirahat di Markas...</p>
                         <button class="btn btn-purple" style="padding: 4px 8px; font-size: 11px; margin-top: 4px;" onclick="restMercenary('${m.id}')">🛌 Pulihkan Stamina (+50)</button>
                     `;
                 } else {
@@ -1068,7 +1077,8 @@
                     `;
                 }
             } else if (m.status === 'DISPATCHED') {
-                let timeLeft = Math.max(0, Math.ceil((m.finishTime - now) / 1000));
+                let finishTime = Number(m.finishTime) || 0;
+                let timeLeft = Math.max(0, Math.ceil((finishTime - now) / 1000));
                 if (timeLeft > 0) {
                     actionHtml = `<p style="font-size: 11px; color: #f59e0b; margin-top: 4px;">⏳ Misi Ekspedisi... Sisa ${timeLeft}s</p>`;
                 } else {
@@ -1083,11 +1093,11 @@
                         <span style="font-size: 10px; color: #38bdf8;">Spesialisasi: ${m.specialization}</span>
                     </div>
                     <div style="font-size: 11px; color: #9ca3af; width: 100%; display: flex; justify-content: space-between;">
-                        <span>Stamina: ${m.stamina}%</span>
+                        <span>Stamina: ${currentStamina}%</span>
                         <span>Status: ${m.status}</span>
                     </div>
                     <div style="width: 100%; background: #374151; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 2px;">
-                        <div style="background: ${m.stamina > 30 ? '#10b981' : '#ef4444'}; width: ${m.stamina}%; height: 100%;"></div>
+                        <div style="background: ${currentStamina > 30 ? '#10b981' : '#ef4444'}; width: ${currentStamina}%; height: 100%;"></div>
                     </div>
                     ${actionHtml}
                 </div>
@@ -1096,15 +1106,17 @@
     }
 
     window.restMercenary = function(mercId) {
+        if (!Array.isArray(window.game.mercenaries)) return;
         let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
         if (!m) return;
-        m.stamina = Math.min(100, (m.stamina || 0) + 50);
+        m.stamina = Math.min(100, (Number(m.stamina) || 0) + 50);
         showToast(`${m.name} telah pulih staminanya!`);
         renderGuild();
         triggerSave();
     }
 
     window.startDispatch = function(mercId) {
+        if (!Array.isArray(window.game.mercenaries)) return;
         let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
         if (!m || m.status !== 'IDLE') return;
 
@@ -1112,16 +1124,20 @@
         if (!selectEl) return;
         let missionId = parseInt(selectEl.value);
         let mission = dispatchMissions.find(mis => mis.id === missionId);
+        if(!mission) return;
 
-        if ((m.stamina || 0) < mission.staminaCost) {
+        let currentStamina = Number(m.stamina) || 0;
+        let staminaCost = Number(mission.staminaCost) || 20;
+
+        if (currentStamina < staminaCost) {
             showToast("Stamina mercenary tidak cukup untuk misi ini! Istirahatkan dulu.");
             return;
         }
 
-        m.stamina -= mission.staminaCost;
+        m.stamina = currentStamina - staminaCost;
         m.status = 'DISPATCHED';
         m.missionId = missionId;
-        m.finishTime = Date.now() + (mission.duration * 1000);
+        m.finishTime = Date.now() + ((Number(mission.duration) || 15) * 1000);
 
         showToast(`${m.name} memulai ekspedisi ke ${mission.name}!`);
         renderGuild();
@@ -1129,6 +1145,7 @@
     }
 
     window.claimDispatch = function(mercId) {
+        if (!Array.isArray(window.game.mercenaries)) return;
         let m = window.game.mercenaries.find(item => String(item.id) === String(mercId));
         if (!m || m.status !== 'DISPATCHED') return;
 
@@ -1138,11 +1155,11 @@
         let rankMult = m.rank === 'Legendary' ? 3 : m.rank === 'Epic' ? 2 : m.rank === 'Rare' ? 1.5 : 1;
         let bonusMatch = m.specialization === mission.reqSpecialization ? 1.5 : 1.0;
 
-        let earnedGems = Math.round(mission.rewardGems * rankMult * bonusMatch);
-        let earnedGold = Math.round(mission.rewardGold * rankMult * bonusMatch);
+        let earnedGems = Math.round((Number(mission.rewardGems) || 15) * rankMult * bonusMatch);
+        let earnedGold = Math.round((Number(mission.rewardGold) || 600) * rankMult * bonusMatch);
 
-        window.game.gems = (window.game.gems || 0) + earnedGems;
-        window.game.gold = (window.game.gold || 0) + earnedGold;
+        window.game.gems = (Number(window.game.gems) || 0) + earnedGems;
+        window.game.gold = (Number(window.game.gold) || 0) + earnedGold;
 
         m.status = 'IDLE';
         m.missionId = null;
@@ -1155,12 +1172,12 @@
     }
 
     window.doAscension = function() {
-        if(window.game.level < 50) {
+        if((Number(window.game.level) || 1) < 50) {
             showToast("Butuh Level 50 untuk melakukan Ascension!");
             return;
         }
-        let soulsGained = Math.floor(window.game.level / 10);
-        window.game.souls = (window.game.souls || 0) + soulsGained;
+        let soulsGained = Math.floor((Number(window.game.level) || 1) / 10);
+        window.game.souls = (Number(window.game.souls) || 0) + soulsGained;
         window.game.level = 1;
         window.game.xp = 0;
         window.game.xpMax = 50;
@@ -1198,14 +1215,14 @@
         let presentDps = document.getElementById('presentDps');
         let ghostStatus = document.getElementById('ghostStatus');
 
-        if(elGold) elGold.innerText = Math.floor(window.game.gold || 0).toLocaleString();
-        if(elGems) elGems.innerText = (window.game.gems || 0).toLocaleString();
-        if(elSouls) elSouls.innerText = (window.game.souls || 0).toLocaleString();
-        if(elWood) elWood.innerText = (window.game.wood || 0).toLocaleString();
-        if(elStone) elStone.innerText = (window.game.stone || 0).toLocaleString();
-        if(elLevel) elLevel.innerText = window.game.level || 1;
-        if(elXp) elXp.innerText = window.game.xp || 0;
-        if(elXpMax) elXpMax.innerText = window.game.xpMax || 50;
+        if(elGold) elGold.innerText = Math.floor(Number(window.game.gold) || 0).toLocaleString();
+        if(elGems) elGems.innerText = (Number(window.game.gems) || 0).toLocaleString();
+        if(elSouls) elSouls.innerText = (Number(window.game.souls) || 0).toLocaleString();
+        if(elWood) elWood.innerText = (Number(window.game.wood) || 0).toLocaleString();
+        if(elStone) elStone.innerText = (Number(window.game.stone) || 0).toLocaleString();
+        if(elLevel) elLevel.innerText = Number(window.game.level) || 1;
+        if(elXp) elXp.innerText = Number(window.game.xp) || 0;
+        if(elXpMax) elXpMax.innerText = Number(window.game.xpMax) || 50;
 
         if(elMonsterHp) elMonsterHp.innerText = Math.max(0, Math.ceil(window.monster.hp));
         if(elMonsterHpMax) elMonsterHpMax.innerText = window.monster.maxHp;
@@ -1214,51 +1231,54 @@
             hpBar.style.width = pct + '%';
         }
 
-        if(frenzyfill) frenzyfill.style.width = (window.game.frenzyRage || 0) + '%';
-        if(frenzyText) frenzyText.innerText = (window.game.frenzyRage || 0) + '%';
-        if(quantumFill) quantumFill.style.width = (window.game.quantumSync || 0) + '%';
-        if(quantumText) quantumText.innerText = (window.game.quantumSync || 0) + '%';
+        let frenzyRageVal = Number(window.game.frenzyRage) || 0;
+        if(frenzyfill) frenzyfill.style.width = frenzyRageVal + '%';
+        if(frenzyText) frenzyText.innerText = Math.round(frenzyRageVal) + '%';
+        
+        let quantumSyncVal = Number(window.game.quantumSync) || 0;
+        if(quantumFill) quantumFill.style.width = quantumSyncVal + '%';
+        if(quantumText) quantumText.innerText = Math.round(quantumSyncVal) + '%';
 
-        let totalDps = (window.game.dps || 0) * (window.game.mapMultiplier || 1) * (1 + (window.game.souls || 0) * 0.5);
+        let totalDps = (Number(window.game.dps) || 0) * (Number(window.game.mapMultiplier) || 1) * (1 + (Number(window.game.souls) || 0) * 0.5);
         if(presentDps) presentDps.innerText = `DPS: ${Math.round(totalDps)}`;
-        if(ghostStatus) ghostStatus.innerText = (window.game.mercenaries && window.game.mercenaries.length > 0) ? "Active (Guild Synergy)" : "Standby (No Mercs)";
+        if(ghostStatus) ghostStatus.innerText = (Array.isArray(window.game.mercenaries) && window.game.mercenaries.length > 0) ? "Active (Guild Synergy)" : "Standby (No Mercs)";
 
         let lvlClick = document.getElementById('lvlClick');
         let incClick = document.getElementById('incClick');
         let costClick = document.getElementById('costClick');
-        if(lvlClick) lvlClick.innerText = window.game.clickLvl || 1;
+        if(lvlClick) lvlClick.innerText = Number(window.game.clickLvl) || 1;
         if(incClick) incClick.innerText = 1;
-        if(costClick) costClick.innerText = window.game.clickCost || 20;
+        if(costClick) costClick.innerText = Number(window.game.clickCost) || 20;
 
         let lvlDps = document.getElementById('lvlDps');
         let incDps = document.getElementById('incDps');
         let costDps = document.getElementById('costDps');
-        if(lvlDps) lvlDps.innerText = window.game.dpsLvl || 0;
+        if(lvlDps) lvlDps.innerText = Number(window.game.dpsLvl) || 0;
         if(incDps) incDps.innerText = 1;
-        if(costDps) costDps.innerText = window.game.dpsCost || 50;
+        if(costDps) costDps.innerText = Number(window.game.dpsCost) || 50;
 
         let lvlBank = document.getElementById('lvlBank');
         let incBank = document.getElementById('incBank');
         let costBank = document.getElementById('costBank');
-        if(lvlBank) lvlBank.innerText = window.game.bankLvl || 0;
+        if(lvlBank) lvlBank.innerText = Number(window.game.bankLvl) || 0;
         if(incBank) incBank.innerText = 5;
-        if(costBank) costBank.innerText = window.game.bankCost || 100;
+        if(costBank) costBank.innerText = Number(window.game.bankCost) || 100;
 
         let chestCostEl = document.getElementById('chestCost');
-        if(chestCostEl) chestCostEl.innerText = window.game.chestCost || 500;
+        if(chestCostEl) chestCostEl.innerText = Number(window.game.chestCost) || 500;
     }
 
-    // Game Loops (DPS, Bank Idle, UI Updates)
     setInterval(() => {
-        let totalDps = (window.game.dps || 0) * (window.game.mapMultiplier || 1) * (1 + (window.game.souls || 0) * 0.5);
+        let totalDps = (Number(window.game.dps) || 0) * (Number(window.game.mapMultiplier) || 1) * (1 + (Number(window.game.souls) || 0) * 0.5);
         if(totalDps > 0) {
             window.monster.hp -= totalDps / 10;
             if(window.monster.hp <= 0) {
                 defeatMonster();
             }
         }
-        if((window.game.bankGold || 0) > 0) {
-            window.game.gold = (window.game.gold || 0) + (window.game.bankGold / 10);
+        let bankGoldVal = Number(window.game.bankGold) || 0;
+        if(bankGoldVal > 0) {
+            window.game.gold = (Number(window.game.gold) || 0) + (bankGoldVal / 10);
         }
         updateUI();
     }, 100);
